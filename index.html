@@ -1,0 +1,3745 @@
+<!doctype html>
+<html lang="ko"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>찾아줘! - AI 분실물 연결소</title>
+  <meta name="description" content="학교와 일상에서 잃어버린 물건과 발견된 물건을 사진 색상·외형 분석과 5가지 기준 비교로 안전하게 연결해주는 분실물 연결 웹앱">
+  <meta property="og:title" content="찾아줘! - AI 분실물 연결소">
+  <meta property="og:description" content="학교와 일상에서 잃어버린 물건과 발견된 물건을 사진 색상·외형 분석과 5가지 기준 비교로 안전하게 연결해주는 분실물 연결 웹앱">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&amp;family=Noto+Sans+KR:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-soft: #f1f5f9;
+      --surface-blue: #eff6ff;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --blue: #2563eb;
+      --blue-hover: #1d4ed8;
+      --blue-deep: #1e3a8a;
+      --blue-border: #bfdbfe;
+      --text: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --green-bg: #ecfdf5;
+      --green-text: #047857;
+      --green-border: #a7f3d0;
+      --amber-bg: #fffbeb;
+      --amber-text: #b45309;
+      --amber-border: #fde68a;
+      --red-bg: #fef2f2;
+      --red-text: #b91c1c;
+      --red-border: #fecaca;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 4px 10px -6px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 24px 48px -12px rgba(15, 23, 42, 0.18);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: "Noto Sans KR", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .tabular {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .mono {
+      font-family: "JetBrains Mono", "Noto Sans KR", monospace;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    /* Header */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: none;
+      border: none;
+      padding: 0;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    .brand-title {
+      font-family: "Plus Jakarta Sans", "Noto Sans KR", sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.2;
+      margin-top: 2px;
+    }
+
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .nav-btn:hover {
+      background: var(--surface-soft);
+      color: var(--text);
+    }
+
+    .nav-btn.active {
+      background: var(--surface-blue);
+      color: var(--blue-hover);
+      border-color: var(--blue-border);
+    }
+
+    .nav-count {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 40px;
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.2;
+      white-space: nowrap;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.24);
+    }
+
+    .btn-primary:hover {
+      background: var(--blue-hover);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text-secondary);
+      border-color: var(--border-strong);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-soft);
+      color: var(--text);
+    }
+
+    .btn-soft-blue {
+      background: var(--surface-blue);
+      color: var(--blue-hover);
+      border-color: var(--blue-border);
+    }
+
+    .btn-soft-blue:hover {
+      background: #dbeafe;
+    }
+
+    .btn-danger-ghost {
+      background: var(--surface);
+      color: var(--red-text);
+      border-color: var(--red-border);
+    }
+
+    .btn-danger-ghost:hover {
+      background: var(--red-bg);
+    }
+
+    .btn-sm {
+      min-height: 34px;
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    /* Main Layout */
+    .main-container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 20px 84px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .section-gap {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Hero */
+    .hero-card {
+      padding: 28px;
+      background: linear-gradient(135deg, #ffffff 0%, #f0f6ff 100%);
+      border: 1px solid var(--blue-border);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .hero-eyebrow {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--blue-hover);
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .hero-title {
+      margin: 0 0 12px;
+      font-size: clamp(24px, 3.2vw, 33px);
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: -0.025em;
+      color: var(--text);
+    }
+
+    .hero-desc {
+      margin: 0 0 22px;
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.65;
+      max-width: 560px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-visual {
+      background: var(--surface);
+      border: 1px solid var(--blue-border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hero-visual-caption {
+      margin-top: 10px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    /* Stats Strip */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .stat-btn {
+      text-align: left;
+      padding: 18px 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+    }
+
+    .stat-btn:hover {
+      border-color: var(--blue);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-1px);
+    }
+
+    .stat-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-value.blue {
+      color: var(--blue);
+    }
+
+    .stat-sub {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Home Two-Column Details */
+    .home-lower-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 20px;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .panel-title {
+      margin: 0 0 6px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .panel-sub {
+      margin: 0 0 18px;
+      font-size: 13.5px;
+      color: var(--text-muted);
+    }
+
+    .criteria-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .criteria-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .criteria-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: var(--surface-blue);
+      color: var(--blue-hover);
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .criteria-row strong {
+      display: block;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .criteria-row span {
+      display: block;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .quick-test-box {
+      padding: 16px;
+      background: var(--surface-blue);
+      border: 1px solid var(--blue-border);
+      border-radius: var(--radius-md);
+      margin-bottom: 16px;
+    }
+
+    .notice-box {
+      padding: 15px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      color: var(--text-secondary);
+    }
+
+    .notice-box ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+    }
+
+    .notice-box li + li {
+      margin-top: 4px;
+    }
+
+    /* Form / Registration */
+    .register-wrap {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 6px;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 22px;
+    }
+
+    .seg-btn {
+      min-height: 44px;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 14px;
+      transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .seg-btn.active {
+      background: var(--surface);
+      color: var(--blue-hover);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-label {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .required-dot {
+      color: var(--blue);
+      margin-left: 3px;
+    }
+
+    .input, .select, .textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 14.5px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .input:focus, .select:focus, .textarea:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .textarea {
+      min-height: 98px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    .field-hint {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    /* Photo Box in Form */
+    .photo-box {
+      padding: 18px;
+      background: var(--bg);
+      border: 1px dashed var(--blue-border);
+      border-radius: var(--radius-md);
+    }
+
+    .photo-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .photo-preview-row {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 164px 1fr;
+      gap: 16px;
+      align-items: start;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .photo-thumb-lg {
+      width: 164px;
+      height: 164px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+    }
+
+    .swatch-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 6px 0 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .color-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      border: 1px solid rgba(15, 23, 42, 0.2);
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    /* Alerts & Inline Banners */
+    .alert {
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .alert-error {
+      background: var(--red-bg);
+      border: 1px solid var(--red-border);
+      color: var(--red-text);
+    }
+
+    .alert-info {
+      background: var(--surface-blue);
+      border: 1px solid var(--blue-border);
+      color: var(--blue-deep);
+    }
+
+    .alert-success {
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+      color: var(--green-text);
+    }
+
+    /* Directory Filters & List */
+    .toolbar {
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .toolbar-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1 1 280px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      padding-left: 38px;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .tab-group {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 4px;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+
+    .tab-btn {
+      min-height: 34px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: var(--surface);
+      color: var(--blue-hover);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filter-selects {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .select-sm {
+      width: auto;
+      min-height: 38px;
+      padding: 6px 10px;
+      font-size: 13.5px;
+    }
+
+    .checkbox-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .item-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .item-card {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.15s ease;
+    }
+
+    .item-card:hover {
+      border-color: var(--blue-border);
+    }
+
+    .item-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .item-meta-line {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meta-type-lost {
+      color: var(--blue-hover);
+    }
+
+    .meta-type-found {
+      color: var(--green-text);
+    }
+
+    .meta-source-user {
+      color: var(--blue);
+    }
+
+    .item-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.35;
+    }
+
+    .status-text {
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+
+    .status-searching {
+      background: var(--surface-blue);
+      color: var(--blue-hover);
+      border-color: var(--blue-border);
+    }
+
+    .status-checking {
+      background: var(--amber-bg);
+      color: var(--amber-text);
+      border-color: var(--amber-border);
+    }
+
+    .status-found {
+      background: var(--green-bg);
+      color: var(--green-text);
+      border-color: var(--green-border);
+    }
+
+    .item-body {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .item-thumb-btn {
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      width: 96px;
+      height: 96px;
+      flex-shrink: 0;
+      background: var(--surface-soft);
+      position: relative;
+    }
+
+    .item-thumb-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .item-thumb-zoom {
+      position: absolute;
+      right: 5px;
+      bottom: 5px;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.72);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .item-facts {
+      flex: 1;
+      min-width: 0;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .item-facts .fact-line {
+      line-height: 1.5;
+    }
+
+    .item-facts strong {
+      color: var(--text);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .item-features {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      background: var(--bg);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    .item-photo-note {
+      font-size: 12.5px;
+      color: var(--blue-deep);
+      background: var(--surface-blue);
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--blue-border);
+    }
+
+    .item-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .status-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-right: 4px;
+    }
+
+    .status-choice {
+      min-height: 30px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    .status-choice.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #ffffff;
+    }
+
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* History List */
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .history-card {
+      padding: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(15, 23, 42, 0.56);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-panel {
+      width: 100%;
+      max-width: 880px;
+      max-height: 90vh;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .modal-head {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--surface);
+    }
+
+    .modal-body {
+      padding: 22px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      background: var(--bg);
+    }
+
+    .modal-foot {
+      padding: 14px 22px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .candidate-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .candidate-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .photo-compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .photo-compare-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      background: var(--bg);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .photo-compare-box img {
+      width: 68px;
+      height: 68px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .criteria-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .criteria-table th, .criteria-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .criteria-table th {
+      width: 130px;
+      background: var(--surface-soft);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .criteria-table tr:last-child th,
+    .criteria-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .verdict-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 5px;
+      margin-right: 6px;
+      white-space: nowrap;
+    }
+
+    .verdict-match {
+      background: var(--green-bg);
+      color: var(--green-text);
+    }
+
+    .verdict-partial {
+      background: var(--surface-blue);
+      color: var(--blue-hover);
+    }
+
+    .verdict-mismatch {
+      background: var(--red-bg);
+      color: var(--red-text);
+    }
+
+    .verdict-check {
+      background: var(--amber-bg);
+      color: var(--amber-text);
+    }
+
+    .pros-cons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .reason-box {
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-size: 13.5px;
+    }
+
+    .reason-box.match-box {
+      background: var(--green-bg);
+      border-color: var(--green-border);
+    }
+
+    .reason-box.diff-box {
+      background: var(--amber-bg);
+      border-color: var(--amber-border);
+    }
+
+    .reason-box h5 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .reason-box ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .reason-box li + li {
+      margin-top: 4px;
+    }
+
+    /* Loading Overlay */
+    .loading-box {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 28px 26px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--blue-border);
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      border: 4px solid var(--surface-blue);
+      border-top-color: var(--blue);
+      animation: spin 0.85s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Lightbox */
+    .lightbox-panel {
+      max-width: 680px;
+      width: 100%;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .lightbox-img {
+      width: 100%;
+      max-height: 68vh;
+      object-fit: contain;
+      background: #0f172a;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      z-index: 80;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Mobile Bottom Nav */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 45;
+      height: 64px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+      padding: 4px 8px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+    }
+
+    .mobile-nav-btn {
+      min-height: 48px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      white-space: nowrap;
+    }
+
+    .mobile-nav-btn.active {
+      color: var(--blue-hover);
+      background: var(--surface-blue);
+    }
+
+    .empty-state {
+      padding: 44px 20px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .empty-state h3 {
+      margin: 0 0 8px;
+      color: var(--text);
+      font-size: 17px;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid,
+      .home-lower-grid,
+      .item-grid,
+      .pros-cons-grid,
+      .photo-compare-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .desktop-nav,
+      .header-cta {
+        display: none;
+      }
+
+      .mobile-nav {
+        display: grid;
+      }
+
+      .main-container {
+        padding: 18px 14px 86px;
+      }
+
+      .hero-card,
+      .panel {
+        padding: 18px;
+      }
+
+      .form-grid,
+      .photo-preview-row {
+        grid-template-columns: 1fr;
+      }
+
+      .photo-thumb-lg {
+        width: 100%;
+        max-height: 240px;
+      }
+
+      .toast {
+        bottom: 76px;
+        width: calc(100% - 32px);
+        text-align: center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+<script src="/_aistudio-iframe.js?v=29045eb3"></script><script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@2.0.4"></script><style>.aistudio-hover-highlight { box-shadow: inset 0 0 0 0.5px white, inset 0 0 0 1.5px rgba(128,128,128,0.6) !important; }.aistudio-active-highlight { outline: 2px solid #87a9ff !important; outline-offset: -2px !important; box-shadow: 0 0 0 0.5px rgba(0,0,0,0.3), inset 0 0 0 0.5px rgba(0,0,0,0.3) !important; }.aistudio-generating-blur { filter: blur(5px) grayscale(100%) brightness(28%) !important; transition: filter 0.3s ease; }#aistudio-focus-mode-tag { position: absolute; display: none; align-items: center; gap: 4px; background: #87a9ff; border-radius: 12px; z-index: 10000; padding: 8px; color: #32302c; font-family: Inter, sans-serif; font-size: 14px; font-style: normal; font-weight: 500; line-height: 21px; pointer-events: none; }#aistudio-hover-mode-tag { position: absolute; display: none; align-items: center; gap: 4px; background: rgba(128,128,128,0.6); border-radius: 12px; z-index: 10000; padding: 8px; color: white; font-family: Inter, sans-serif; font-size: 14px; font-style: normal; font-weight: 500; line-height: 21px; pointer-events: none; }.aistudio-img-icon { display: none; vertical-align: middle; pointer-events: auto; cursor: pointer; }.aistudio-img-icon.visible { display: inline-flex; }#aistudio-focus-mode-tag .aistudio-img-icon { position: relative; width: 26px; height: 26px; background: #32302c; border-radius: 6px; margin: -4px -4px -4px 0; }#aistudio-focus-mode-tag .aistudio-img-icon::before { content: ""; position: absolute; top: 4px; left: 4px; width: 18px; height: 18px; background-color: white; -webkit-mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); mask-size: contain; mask-repeat: no-repeat; }#aistudio-hover-mode-tag .aistudio-img-icon { position: relative; width: 18px; height: 18px; margin-left: 4px; }#aistudio-hover-mode-tag .aistudio-img-icon::before { content: ""; position: absolute; top: 0; left: 0; width: 18px; height: 18px; background-color: white; -webkit-mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); mask-size: contain; mask-repeat: no-repeat; }#aistudio-focus-mode-tag .aistudio-img-icon:hover, #aistudio-hover-mode-tag .aistudio-img-icon:hover { background: #424242 !important; }#aistudio-focus-mode-tag .aistudio-img-icon:active, #aistudio-hover-mode-tag .aistudio-img-icon:active { background: #393f51 !important; }</style></head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <button type="button" class="brand" id="brandBtn" aria-label="찾아줘 홈으로 이동">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.5-3.5"></path>
+            <path d="M11 8v6"></path>
+            <path d="M8 11h6"></path>
+          </svg>
+        </span>
+        <span>
+          <span class="brand-title">찾아줘!</span>
+          <span class="brand-sub">AI 분실물 연결소</span>
+        </span>
+      </button>
+
+      <nav class="desktop-nav" aria-label="주요 메뉴">
+        <button type="button" class="nav-btn" data-nav="home">홈 안내</button>
+        <button type="button" class="nav-btn" data-nav="list">물건 목록 <span class="nav-count" id="navItemCount">0</span></button>
+        <button type="button" class="nav-btn" data-nav="register">물건 등록</button>
+        <button type="button" class="nav-btn" data-nav="history">분석 기록 <span class="nav-count" id="navHistoryCount">0</span></button>
+      </nav>
+
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button type="button" class="btn btn-secondary header-cta" id="headerDownloadHtmlBtn" title="단일 index.html 파일 다운로드">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          index.html 저장
+        </button>
+        <button type="button" class="btn btn-primary header-cta" id="headerRegisterCta">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 5v14"></path>
+            <path d="M5 12h14"></path>
+          </svg>
+          물건 등록하기
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container" id="appMain"></main>
+
+  <nav class="mobile-nav" aria-label="모바일 하단 메뉴">
+    <button type="button" class="mobile-nav-btn" data-nav="home">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 10.5 12 3l9 7.5"></path>
+        <path d="M5 9.5V20h14V9.5"></path>
+      </svg>
+      <span>홈 안내</span>
+    </button>
+    <button type="button" class="mobile-nav-btn" data-nav="list">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="8" y1="6" x2="21" y2="6"></line>
+        <line x1="8" y1="12" x2="21" y2="12"></line>
+        <line x1="8" y1="18" x2="21" y2="18"></line>
+        <circle cx="4" cy="6" r="1"></circle>
+        <circle cx="4" cy="12" r="1"></circle>
+        <circle cx="4" cy="18" r="1"></circle>
+      </svg>
+      <span>물건 목록</span>
+    </button>
+    <button type="button" class="mobile-nav-btn" data-nav="register">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+        <path d="M12 8v8"></path>
+        <path d="M8 12h8"></path>
+      </svg>
+      <span>물건 등록</span>
+    </button>
+    <button type="button" class="mobile-nav-btn" data-nav="history">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"></circle>
+        <polyline points="12 7 12 12 15 15"></polyline>
+      </svg>
+      <span>분석 기록</span>
+    </button>
+  </nav>
+
+  <!-- Loading Overlay -->
+  <div class="modal-backdrop" id="loadingModal" role="dialog" aria-modal="true" aria-labelledby="loadingTitle">
+    <div class="loading-box">
+      <div class="spinner" aria-hidden="true"></div>
+      <h3 id="loadingTitle" style="margin:0 0 8px;font-size:18px;">AI가 물건 특징을 비교하고 있어요</h3>
+      <p id="loadingDesc" style="margin:0;font-size:13.5px;color:var(--text-muted);">
+        사진 색상·외형과 5가지 기준(종류, 색상, 특징, 장소, 날짜)을 함께 대조하는 중입니다.
+      </p>
+    </div>
+  </div>
+
+  <!-- Analysis Result Modal -->
+  <div class="modal-backdrop" id="analysisModal" role="dialog" aria-modal="true" aria-labelledby="analysisModalTitle">
+    <div class="modal-panel">
+      <div class="modal-head">
+        <div>
+          <div style="font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:4px;">5가지 기준 AI 비교 결과</div>
+          <h2 id="analysisModalTitle" style="margin:0;font-size:20px;">추천 후보 비교</h2>
+          <p id="analysisModalSub" style="margin:4px 0 0;font-size:13px;color:var(--text-muted);"></p>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="closeAnalysisModalBtn" aria-label="결과 창 닫기">닫기</button>
+      </div>
+      <div class="modal-body" id="analysisModalBody"></div>
+      <div class="modal-foot" id="analysisModalFoot"></div>
+    </div>
+  </div>
+
+  <!-- Photo Lightbox Modal -->
+  <div class="modal-backdrop" id="lightboxModal" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle">
+    <div class="lightbox-panel">
+      <div class="modal-head">
+        <div>
+          <h3 id="lightboxTitle" style="margin:0;font-size:17px;">물건 사진 크게 보기</h3>
+          <p id="lightboxSub" style="margin:4px 0 0;font-size:13px;color:var(--text-muted);"></p>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="closeLightboxBtn">닫기</button>
+      </div>
+      <img id="lightboxImg" class="lightbox-img" alt="등록된 물건 확대 사진">
+      <div id="lightboxCaption" style="padding:14px 20px;font-size:13.5px;color:var(--text-secondary);background:var(--surface);"></div>
+    </div>
+  </div>
+
+  <!-- Hidden reusable file inputs for card quick photo attach -->
+  <input type="file" id="cardPhotoInput" accept="image/*" class="sr-only">
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var STORAGE_ITEMS_KEY = "chajajwo_items_v1";
+      var STORAGE_ANALYSES_KEY = "chajajwo_analyses_v1";
+
+      var CATEGORIES = [
+        "전자기기",
+        "지갑·카드",
+        "열쇠·차키",
+        "우산",
+        "가방·파우치",
+        "의류·잡화",
+        "학용품·도서",
+        "기타"
+      ];
+
+      function makeSvgDataUri(svgContent) {
+        return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svgContent);
+      }
+
+      var HERO_SVG =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" width="360" height="220">' +
+        '<rect width="360" height="220" rx="14" fill="#EFF6FF"/>' +
+        '<rect x="20" y="168" width="320" height="32" rx="8" fill="#DBEAFE"/>' +
+        '<rect x="36" y="40" width="110" height="128" rx="12" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="2"/>' +
+        '<rect x="52" y="58" width="78" height="58" rx="8" fill="#F8FAFC" stroke="#CBD5E1"/>' +
+        '<rect x="74" y="68" width="34" height="38" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>' +
+        '<line x1="74" y1="84" x2="108" y2="84" stroke="#CBD5E1" stroke-width="2"/>' +
+        '<circle cx="91" cy="95" r="3" fill="#2563EB"/>' +
+        '<rect x="52" y="126" width="54" height="8" rx="4" fill="#2563EB"/>' +
+        '<rect x="52" y="141" width="76" height="7" rx="3.5" fill="#CBD5E1"/>' +
+        '<rect x="214" y="40" width="110" height="128" rx="12" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="2"/>' +
+        '<rect x="230" y="58" width="78" height="58" rx="8" fill="#F8FAFC" stroke="#CBD5E1"/>' +
+        '<rect x="252" y="68" width="34" height="38" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2"/>' +
+        '<circle cx="269" cy="95" r="3" fill="#059669"/>' +
+        '<rect x="230" y="126" width="60" height="8" rx="4" fill="#059669"/>' +
+        '<rect x="230" y="141" width="74" height="7" rx="3.5" fill="#CBD5E1"/>' +
+        '<path d="M154 96 H206" stroke="#2563EB" stroke-width="3" stroke-linecap="round" stroke-dasharray="5 5"/>' +
+        '<circle cx="180" cy="96" r="16" fill="#2563EB"/>' +
+        '<path d="M174 96 l4 4 l8 -8" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '</svg>';
+
+      var SEED_EARBUDS_PHOTO = makeSvgDataUri(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">' +
+        '<rect width="320" height="240" fill="#E2E8F0"/>' +
+        '<rect x="30" y="150" width="260" height="90" fill="#CBD5E1"/>' +
+        '<rect x="106" y="56" width="108" height="122" rx="30" fill="#FFFFFF" stroke="#94A3B8" stroke-width="3"/>' +
+        '<line x1="106" y1="100" x2="214" y2="100" stroke="#CBD5E1" stroke-width="3"/>' +
+        '<circle cx="160" cy="126" r="6" fill="#10B981"/>' +
+        '<circle cx="190" cy="152" r="10" fill="#60A5FA" opacity="0.85"/>' +
+        '<circle cx="190" cy="152" r="4" fill="#FFFFFF"/>' +
+        '</svg>'
+      );
+
+      var SEED_WALLET_PHOTO = makeSvgDataUri(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">' +
+        '<rect width="320" height="240" fill="#F1F5F9"/>' +
+        '<rect x="64" y="56" width="192" height="126" rx="14" fill="#1E3A8A" stroke="#172554" stroke-width="3"/>' +
+        '<rect x="82" y="74" width="156" height="26" rx="5" fill="#1D4ED8"/>' +
+        '<rect x="82" y="114" width="76" height="44" rx="6" fill="#93C5FD"/>' +
+        '<rect x="174" y="122" width="60" height="10" rx="5" fill="#BFDBFE"/>' +
+        '<circle cx="242" cy="70" r="9" fill="#94A3B8"/>' +
+        '</svg>'
+      );
+
+      var SEED_UMBRELLA_PHOTO = makeSvgDataUri(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">' +
+        '<rect width="320" height="240" fill="#EFF6FF"/>' +
+        '<rect x="52" y="96" width="184" height="36" rx="16" fill="#38BDF8" stroke="#0284C7" stroke-width="3"/>' +
+        '<rect x="176" y="96" width="16" height="36" fill="#E0F2FE"/>' +
+        '<path d="M236 114 H258 C272 114 276 136 258 140" fill="none" stroke="#1E293B" stroke-width="10" stroke-linecap="round"/>' +
+        '<rect x="40" y="109" width="14" height="10" rx="4" fill="#64748B"/>' +
+        '</svg>'
+      );
+
+      function getRelativeDate(offsetDays) {
+        var d = new Date();
+        d.setDate(d.getDate() + offsetDays);
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, "0");
+        var day = String(d.getDate()).padStart(2, "0");
+        return y + "-" + m + "-" + day;
+      }
+
+      function createSeedItems() {
+        var d1 = getRelativeDate(-2);
+        var d2 = getRelativeDate(-1);
+        var d3 = getRelativeDate(-3);
+        return [
+          {
+            id: "ex-lost-1",
+            type: "lost",
+            source: "example",
+            name: "흰색 무선 이어폰",
+            category: "전자기기",
+            color: "흰색",
+            location: "본관 2층 수학실 앞 복도",
+            date: d1,
+            features: "투명 보호 케이스가 끼워져 있고 오른쪽 아래에 작은 파란 별 스티커가 붙어 있음",
+            status: "찾는 중",
+            createdAt: Date.now() - 180000000
+          },
+          {
+            id: "ex-lost-2",
+            type: "lost",
+            source: "example",
+            name: "남색 카드지갑",
+            category: "지갑·카드",
+            color: "남색",
+            location: "학교 매점 앞 벤치",
+            date: d2,
+            features: "앞면에 카드 2장이 꽂혀 있고 지퍼 고리에 은색 열쇠고리가 달려 있음",
+            status: "찾는 중",
+            createdAt: Date.now() - 95000000
+          },
+          {
+            id: "ex-found-1",
+            type: "found",
+            source: "example",
+            name: "무선 이어폰 본체",
+            category: "전자기기",
+            color: "흰색",
+            location: "2층 교무실 앞 복도 (학생회 보관)",
+            date: d1,
+            features: "투명 실리콘 케이스가 씌워져 있으며 하단에 파란색 스티커 흔적이 보임",
+            status: "보관 중",
+            photoDataUrl: SEED_EARBUDS_PHOTO,
+            photoAnalysis: {
+              dominantColor: "흰색",
+              secondaryColor: "회색",
+              tone: "밝은 톤",
+              shapeNote: "가로가 약간 넓은 형태",
+              summary: "사진에서 흰색 바탕과 회색·파란색 계열 포인트가 확인되었습니다.",
+              rgbHex: "#E2E8F0"
+            },
+            createdAt: Date.now() - 170000000
+          },
+          {
+            id: "ex-found-2",
+            type: "found",
+            source: "example",
+            name: "남색 반지갑형 카드홀더",
+            category: "지갑·카드",
+            color: "남색",
+            location: "학생회실 앞 분실물함",
+            date: d2,
+            features: "어두운 남색 인조가죽이며 옆면 고리에 작은 금속 링이 있음. 교통카드 포함",
+            status: "보관 중",
+            photoDataUrl: SEED_WALLET_PHOTO,
+            photoAnalysis: {
+              dominantColor: "남색",
+              secondaryColor: "하늘색",
+              tone: "중간 톤",
+              shapeNote: "가로가 약간 넓은 형태",
+              summary: "사진에서 어두운 남색 바탕과 하늘색 카드 수납 포인트가 보입니다.",
+              rgbHex: "#1E3A8A"
+            },
+            createdAt: Date.now() - 88000000
+          },
+          {
+            id: "ex-found-3",
+            type: "found",
+            source: "example",
+            name: "접이식 3단 우산",
+            category: "우산",
+            color: "하늘색",
+            location: "체육관 입구 우산꽂이",
+            date: d3,
+            features: "하늘색 천 재질에 검은색 J자 손잡이, 흰색 끈이 달린 3단 우산",
+            status: "보관 중",
+            photoDataUrl: SEED_UMBRELLA_PHOTO,
+            photoAnalysis: {
+              dominantColor: "하늘색",
+              secondaryColor: "흰색",
+              tone: "밝은 톤",
+              shapeNote: "가로로 긴 형태",
+              summary: "사진에서 하늘색 계열 면적과 검정 손잡이 대비가 뚜렷합니다.",
+              rgbHex: "#38BDF8"
+            },
+            createdAt: Date.now() - 250000000
+          }
+        ];
+      }
+
+      // Security & Validation Helpers
+      function escapeHtml(value) {
+        if (value === null || value === undefined) return "";
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function sanitizeImageUrl(url) {
+        if (!url || typeof url !== "string") return "";
+        if (
+          url.indexOf("data:image/jpeg;base64,") === 0 ||
+          url.indexOf("data:image/png;base64,") === 0 ||
+          url.indexOf("data:image/webp;base64,") === 0 ||
+          url.indexOf("data:image/svg+xml") === 0
+        ) {
+          return url;
+        }
+        return "";
+      }
+
+      function detectPersonalInfo(text) {
+        if (!text) return null;
+        var mobileRegex = /01[016789][-\s.]?\d{3,4}[-\s.]?\d{4}/;
+        var landlineRegex = /(02|0[3-6]\d)[-\s.]?\d{3,4}[-\s.]?\d{4}/;
+        var emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+        var rrnRegex = /\b\d{6}[-\s]?[1-4]\d{6}\b/;
+
+        if (mobileRegex.test(text) || landlineRegex.test(text)) {
+          return "전화번호는 개인정보 보호를 위해 등록할 수 없습니다. 연락처 없이 물건 특징만 적어주세요.";
+        }
+        if (emailRegex.test(text)) {
+          return "이메일 주소는 공개 화면에 입력할 수 없습니다. 학교/보관 장소 안내만 입력해주세요.";
+        }
+        if (rrnRegex.test(text)) {
+          return "주민등록번호와 같은 민감한 숫자는 입력할 수 없습니다.";
+        }
+        return null;
+      }
+
+      function loadItems() {
+        try {
+          var raw = localStorage.getItem(STORAGE_ITEMS_KEY);
+          if (!raw) {
+            var seeded = createSeedItems();
+            saveItems(seeded);
+            return seeded;
+          }
+          var parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed) || parsed.length === 0) {
+            var fallback = createSeedItems();
+            saveItems(fallback);
+            return fallback;
+          }
+          return parsed;
+        } catch (err) {
+          return createSeedItems();
+        }
+      }
+
+      function saveItems(items) {
+        try {
+          localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(items));
+          return true;
+        } catch (err) {
+          showToast("저장 공간이 부족하여 일부 데이터를 저장하지 못했습니다. 오래된 사진을 정리해보세요.");
+          return false;
+        }
+      }
+
+      function loadAnalyses() {
+        try {
+          var raw = localStorage.getItem(STORAGE_ANALYSES_KEY);
+          if (!raw) return [];
+          var parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (err) {
+          return [];
+        }
+      }
+
+      function saveAnalyses(list) {
+        try {
+          localStorage.setItem(STORAGE_ANALYSES_KEY, JSON.stringify(list.slice(0, 30)));
+          return true;
+        } catch (err) {
+          return false;
+        }
+      }
+
+      // Color & Photo Canvas Analysis (pure browser, zero API keys)
+      var COLOR_FAMILIES = {
+        "흰색": ["흰색", "화이트", "아이보리", "백색", "하얀", "연회색"],
+        "검정색": ["검정", "검은", "블랙", "까만", "다크", "진회색"],
+        "회색": ["회색", "그레이", "은색", "실버", "메탈", "차콜"],
+        "남색": ["남색", "네이비", "진파랑", "곤색", "딥블루"],
+        "파란색": ["파랑", "파란", "블루", "코발트", "청색"],
+        "하늘색": ["하늘", "스카이", "연파랑", "민트블루", "시안"],
+        "빨간색": ["빨강", "빨간", "레드", "적색", "와인", "버건디"],
+        "분홍색": ["분홍", "핑크", "로즈", "코랄"],
+        "주황색": ["주황", "오렌지", "살구"],
+        "노란색": ["노랑", "노란", "옐로우", "골드", "금색", "머스타드"],
+        "베이지색": ["베이지", "크림", "연갈색", "카키베이지"],
+        "갈색": ["갈색", "브라운", "초코", "카멜", "황토"],
+        "초록색": ["초록", "녹색", "그린", "연두", "카키", "올리브", "민트"],
+        "보라색": ["보라", "퍼플", "라벤더", "바이올렛", "연보라"]
+      };
+
+      function normalizeColorFamily(colorText) {
+        if (!colorText) return "";
+        var clean = String(colorText).trim().toLowerCase();
+        var keys = Object.keys(COLOR_FAMILIES);
+        for (var i = 0; i < keys.length; i++) {
+          var fam = keys[i];
+          var words = COLOR_FAMILIES[fam];
+          for (var j = 0; j < words.length; j++) {
+            if (clean.indexOf(words[j]) !== -1) return fam;
+          }
+        }
+        return clean;
+      }
+
+      function areCloseColorFamilies(f1, f2) {
+        if (!f1 || !f2) return false;
+        if (f1 === f2) return true;
+        var closePairs = [
+          ["남색", "파란색"],
+          ["파란색", "하늘색"],
+          ["남색", "검정색"],
+          ["흰색", "회색"],
+          ["흰색", "베이지색"],
+          ["베이지색", "갈색"],
+          ["노란색", "베이지색"],
+          ["빨간색", "분홍색"],
+          ["빨간색", "주황색"],
+          ["검정색", "회색"]
+        ];
+        for (var i = 0; i < closePairs.length; i++) {
+          var a = closePairs[i][0];
+          var b = closePairs[i][1];
+          if ((f1 === a && f2 === b) || (f1 === b && f2 === a)) return true;
+        }
+        return false;
+      }
+
+      function rgbToHsl(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        var max = Math.max(r, g, b);
+        var min = Math.min(r, g, b);
+        var h = 0;
+        var s = 0;
+        var l = (max + min) / 2;
+        if (max !== min) {
+          var d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          switch (max) {
+            case r:
+              h = (g - b) / d + (g < b ? 6 : 0);
+              break;
+            case g:
+              h = (b - r) / d + 2;
+              break;
+            default:
+              h = (r - g) / d + 4;
+          }
+          h *= 60;
+        }
+        return { h: h, s: s * 100, l: l * 100 };
+      }
+
+      function classifyRgbToKoreanColor(r, g, b) {
+        var hsl = rgbToHsl(r, g, b);
+        var h = hsl.h;
+        var s = hsl.s;
+        var l = hsl.l;
+
+        if (l >= 88 && s < 22) return "흰색";
+        if (l <= 13 || (l <= 19 && s < 35)) return "검정색";
+        if (s < 14) {
+          if (l > 72) return "흰색";
+          if (l < 30) return "검정색";
+          return "회색";
+        }
+        if (h >= 345 || h < 14) {
+          return l > 66 ? "분홍색" : "빨간색";
+        }
+        if (h >= 14 && h < 38) {
+          if (l > 74 && s < 55) return "베이지색";
+          if (l < 45) return "갈색";
+          return "주황색";
+        }
+        if (h >= 38 && h < 66) {
+          if (l > 76 && s < 48) return "베이지색";
+          if (l < 42) return "갈색";
+          return "노란색";
+        }
+        if (h >= 66 && h < 165) {
+          return "초록색";
+        }
+        if (h >= 165 && h < 205) {
+          return l >= 54 ? "하늘색" : "파란색";
+        }
+        if (h >= 205 && h < 252) {
+          if (l < 38) return "남색";
+          if (l > 70) return "하늘색";
+          return "파란색";
+        }
+        if (h >= 252 && h < 312) {
+          return "보라색";
+        }
+        return "분홍색";
+      }
+
+      function rgbToHex(r, g, b) {
+        function hex(n) {
+          return Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, "0");
+        }
+        return "#" + hex(r) + hex(g) + hex(b);
+      }
+
+      function processImageFile(file) {
+        return new Promise(function (resolve, reject) {
+          if (!file || !file.type || file.type.indexOf("image/") !== 0) {
+            reject(new Error("이미지 파일(JPG, PNG, WEBP 등)만 올릴 수 있어요."));
+            return;
+          }
+          if (file.size > 12 * 1024 * 1024) {
+            reject(new Error("사진 용량이 12MB를 넘습니다. 조금 더 작은 사진을 선택해주세요."));
+            return;
+          }
+
+          var reader = new FileReader();
+          reader.onerror = function () {
+            reject(new Error("사진 파일을 읽지 못했습니다. 다시 시도해주세요."));
+          };
+          reader.onload = function (ev) {
+            var img = new Image();
+            img.onerror = function () {
+              reject(new Error("지원하지 않는 이미지 형식입니다."));
+            };
+            img.onload = function () {
+              try {
+                var maxDim = 720;
+                var w = img.naturalWidth || img.width;
+                var h = img.naturalHeight || img.height;
+                var scale = Math.min(1, maxDim / Math.max(w, h));
+                var cw = Math.max(1, Math.round(w * scale));
+                var ch = Math.max(1, Math.round(h * scale));
+
+                var canvas = document.createElement("canvas");
+                canvas.width = cw;
+                canvas.height = ch;
+                var ctx = canvas.getContext("2d");
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, cw, ch);
+                ctx.drawImage(img, 0, 0, cw, ch);
+
+                var dataUrl = canvas.toDataURL("image/jpeg", 0.78);
+
+                // Analyze center-weighted pixels on small sample canvas
+                var sw = 64;
+                var sh = Math.max(32, Math.round((ch / cw) * 64));
+                var sCanvas = document.createElement("canvas");
+                sCanvas.width = sw;
+                sCanvas.height = sh;
+                var sCtx = sCanvas.getContext("2d");
+                sCtx.drawImage(img, 0, 0, sw, sh);
+                var px = sCtx.getImageData(0, 0, sw, sh).data;
+
+                var colorCounts = {};
+                var colorRgbSums = {};
+                var lumSum = 0;
+                var weightTotal = 0;
+
+                for (var y = 0; y < sh; y++) {
+                  for (var x = 0; x < sw; x++) {
+                    var idx = (y * sw + x) * 4;
+                    var r = px[idx];
+                    var g = px[idx + 1];
+                    var b = px[idx + 2];
+                    var a = px[idx + 3];
+                    if (a < 100) continue;
+
+                    // Weight center area higher since subjects are centered
+                    var dx = (x - sw / 2) / (sw / 2);
+                    var dy = (y - sh / 2) / (sh / 2);
+                    var inCenter = dx * dx + dy * dy <= 0.45;
+                    var weight = inCenter ? 3 : 1;
+
+                    // De-prioritize extreme near-white background edges
+                    var isBorder = x < sw * 0.14 || x > sw * 0.86 || y < sh * 0.14 || y > sh * 0.86;
+                    if (isBorder && r > 235 && g > 235 && b > 235) {
+                      weight = 0.25;
+                    }
+
+                    var cname = classifyRgbToKoreanColor(r, g, b);
+                    colorCounts[cname] = (colorCounts[cname] || 0) + weight;
+                    if (!colorRgbSums[cname]) colorRgbSums[cname] = { r: 0, g: 0, b: 0, w: 0 };
+                    colorRgbSums[cname].r += r * weight;
+                    colorRgbSums[cname].g += g * weight;
+                    colorRgbSums[cname].b += b * weight;
+                    colorRgbSums[cname].w += weight;
+
+                    lumSum += (0.299 * r + 0.587 * g + 0.114 * b) * weight;
+                    weightTotal += weight;
+                  }
+                }
+
+                var sortedColors = Object.keys(colorCounts).sort(function (c1, c2) {
+                  return colorCounts[c2] - colorCounts[c1];
+                });
+
+                var dominant = sortedColors[0] || "회색";
+                var secondary = sortedColors[1] || "";
+                // Avoid reporting pure background white as dominant if strong subject color follows closely
+                if (dominant === "흰색" && secondary && colorCounts[secondary] > colorCounts[dominant] * 0.52) {
+                  dominant = secondary;
+                  secondary = "흰색";
+                }
+
+                var avgStats = colorRgbSums[dominant] || { r: 148, g: 163, b: 184, w: 1 };
+                var rgbHex = rgbToHex(
+                  avgStats.r / avgStats.w,
+                  avgStats.g / avgStats.w,
+                  avgStats.b / avgStats.w
+                );
+
+                var avgLum = weightTotal > 0 ? lumSum / weightTotal : 128;
+                var tone = avgLum > 175 ? "밝은 톤" : avgLum < 90 ? "어두운 톤" : "중간 톤";
+
+                var ratio = cw / ch;
+                var shapeNote =
+                  ratio > 1.32
+                    ? "가로로 긴 형태"
+                    : ratio < 0.78
+                    ? "세로로 긴 형태"
+                    : "균형 잡힌 네모·둥근 형태";
+
+                var summary =
+                  "사진 분석 결과 주된 색상은 '" +
+                  dominant +
+                  "'" +
+                  (secondary ? "(보조 색상: " + secondary + ")" : "") +
+                  "이며 전체적으로 " +
+                  tone +
+                  ", " +
+                  shapeNote +
+                  "로 파악되었습니다.";
+
+                resolve({
+                  dataUrl: dataUrl,
+                  analysis: {
+                    dominantColor: dominant,
+                    secondaryColor: secondary,
+                    tone: tone,
+                    shapeNote: shapeNote,
+                    summary: summary,
+                    rgbHex: rgbHex
+                  }
+                });
+              } catch (err) {
+                reject(new Error("사진 색상 분석 중 문제가 발생했습니다."));
+              }
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // 5-Criteria Comparison Engine
+      function tokenizeKorean(text) {
+        if (!text) return [];
+        var clean = String(text)
+          .toLowerCase()
+          .replace(/[^\w가-힣\s]/g, " ")
+          .replace(/(이|가|을|를|은|는|에|에서|으로|로|와|과|의|하고|이며|이고|있음|보임|달려|붙어|작은|큰)\b/g, " ");
+        var parts = clean.split(/\s+/);
+        var result = [];
+        var seen = {};
+        for (var i = 0; i < parts.length; i++) {
+          var p = parts[i].trim();
+          if (p.length >= 2 && !seen[p]) {
+            seen[p] = true;
+            result.push(p);
+          }
+        }
+        return result;
+      }
+
+      function computeDateDiffDays(lostDateStr, foundDateStr) {
+        if (!lostDateStr || !foundDateStr) return null;
+        var t1 = Date.parse(lostDateStr + "T00:00:00");
+        var t2 = Date.parse(foundDateStr + "T00:00:00");
+        if (isNaN(t1) || isNaN(t2)) return null;
+        return Math.round((t2 - t1) / 86400000);
+      }
+
+      function compareLostWithFound(lostItem, foundItem) {
+        var score = 0;
+        var reasons = [];
+        var differences = [];
+        var criteria = {};
+
+        // 1. Category (물건 종류)
+        if (lostItem.category === foundItem.category) {
+          score += 28;
+          criteria.category = {
+            verdict: "일치",
+            cls: "verdict-match",
+            detail: "두 물건 모두 '" + foundItem.category + "' 종류로 등록되었습니다."
+          };
+          reasons.push("물건 종류가 '" + foundItem.category + "'(으)로 서로 같습니다.");
+        } else if (
+          lostItem.category === "기타" ||
+          foundItem.category === "기타"
+        ) {
+          score += 8;
+          criteria.category = {
+            verdict: "확인 필요",
+            cls: "verdict-check",
+            detail: "분실물('" + lostItem.category + "')과 발견물('" + foundItem.category + "')의 분류가 달라 확인이 필요합니다."
+          };
+          differences.push("물건 종류가 '" + lostItem.category + "'와 '" + foundItem.category + "'(으)로 다릅니다.");
+        } else {
+          criteria.category = {
+            verdict: "불일치",
+            cls: "verdict-mismatch",
+            detail: "분실물은 '" + lostItem.category + "', 발견물은 '" + foundItem.category + "'(으)로 종류가 다릅니다."
+          };
+          differences.push("물건 종류가 서로 다릅니다(" + lostItem.category + " vs " + foundItem.category + ").");
+        }
+
+        // 2. Color (색상 + 사진 색상 비교)
+        var lostTextCol = normalizeColorFamily(lostItem.color);
+        var foundTextCol = normalizeColorFamily(foundItem.color);
+        var lostPhotoCol = lostItem.photoAnalysis ? normalizeColorFamily(lostItem.photoAnalysis.dominantColor) : "";
+        var foundPhotoCol = foundItem.photoAnalysis ? normalizeColorFamily(foundItem.photoAnalysis.dominantColor) : "";
+
+        var effectiveLostCol = lostTextCol || lostPhotoCol;
+        var effectiveFoundCol = foundTextCol || foundPhotoCol;
+        var photoColorMatched =
+          lostPhotoCol &&
+          foundPhotoCol &&
+          (lostPhotoCol === foundPhotoCol ||
+            areCloseColorFamilies(lostPhotoCol, foundPhotoCol) ||
+            (foundItem.photoAnalysis && foundItem.photoAnalysis.secondaryColor && areCloseColorFamilies(lostPhotoCol, foundItem.photoAnalysis.secondaryColor)));
+
+        if (effectiveLostCol && effectiveFoundCol && effectiveLostCol === effectiveFoundCol) {
+          score += 24;
+          var colDetail = "색상이 '" + foundItem.color + "' 계열로 일치합니다.";
+          if (photoColorMatched) {
+            colDetail += " 등록된 사진 색상 분석 결과와도 같습니다.";
+          }
+          criteria.color = { verdict: "일치", cls: "verdict-match", detail: colDetail };
+          reasons.push(colDetail);
+        } else if (
+          (effectiveLostCol && effectiveFoundCol && areCloseColorFamilies(effectiveLostCol, effectiveFoundCol)) ||
+          photoColorMatched
+        ) {
+          score += 14;
+          criteria.color = {
+            verdict: "부분 일치",
+            cls: "verdict-partial",
+            detail: "입력 색상은 '" + lostItem.color + "'과 '" + foundItem.color + "'이지만 비슷한 색상 계열로 보입니다."
+          };
+          reasons.push("색상이 비슷한 계열(" + lostItem.color + " · " + foundItem.color + ")입니다.");
+          differences.push("정확한 색감이 다를 수 있으니 실물 톤을 확인해보세요.");
+        } else {
+          criteria.color = {
+            verdict: "불일치",
+            cls: "verdict-mismatch",
+            detail: "분실물 색상('" + lostItem.color + "')과 발견물 색상('" + foundItem.color + "')이 다릅니다."
+          };
+          differences.push("색상이 서로 다릅니다(" + lostItem.color + " vs " + foundItem.color + ").");
+        }
+
+        // 3. Appearance & Features (외형과 특징)
+        var lostTokens = tokenizeKorean(lostItem.name + " " + lostItem.features + " " + (lostItem.photoAnalysis ? lostItem.photoAnalysis.summary : ""));
+        var foundTokens = tokenizeKorean(foundItem.name + " " + foundItem.features + " " + (foundItem.photoAnalysis ? foundItem.photoAnalysis.summary : ""));
+        var sharedTokens = [];
+        for (var i = 0; i < lostTokens.length; i++) {
+          var tk = lostTokens[i];
+          for (var j = 0; j < foundTokens.length; j++) {
+            if (foundTokens[j] === tk || (tk.length >= 2 && foundTokens[j].indexOf(tk) !== -1) || (foundTokens[j].length >= 2 && tk.indexOf(foundTokens[j]) !== -1)) {
+              if (sharedTokens.indexOf(tk) === -1) sharedTokens.push(tk);
+              break;
+            }
+          }
+        }
+
+        if (sharedTokens.length >= 2) {
+          score += 24;
+          criteria.features = {
+            verdict: "일치",
+            cls: "verdict-match",
+            detail: "공통 키워드(" + sharedTokens.slice(0, 4).join(", ") + ")가 확인되어 외형 특징이 가깝습니다."
+          };
+          reasons.push("특징 설명에서 '" + sharedTokens.slice(0, 3).join(", ") + "' 등 공통 단서가 겹칩니다.");
+        } else if (sharedTokens.length === 1) {
+          score += 13;
+          criteria.features = {
+            verdict: "부분 일치",
+            cls: "verdict-partial",
+            detail: "'" + sharedTokens[0] + "' 단서는 겹치지만 나머지 외형 특징은 직접 확인이 필요합니다."
+          };
+          reasons.push("외형 설명에서 '" + sharedTokens[0] + "' 특징이 공통으로 보입니다.");
+          differences.push("세부 스크래치, 스티커, 브랜드 등 나머지 외형 특징은 추가 확인이 필요합니다.");
+        } else {
+          criteria.features = {
+            verdict: "확인 필요",
+            cls: "verdict-check",
+            detail: "텍스트로 적힌 외형 특징 키워드가 직접 겹치지 않습니다. 사진이나 실물로 확인해주세요."
+          };
+          differences.push("적힌 외형·특징 표현이 서로 달라 본인 물건인지 꼼꼼히 확인해야 합니다.");
+        }
+
+        // 4. Location (분실 장소와 발견 장소)
+        var locLost = tokenizeKorean(lostItem.location);
+        var locFound = tokenizeKorean(foundItem.location);
+        var locShared = [];
+        for (var a = 0; a < locLost.length; a++) {
+          for (var b = 0; b < locFound.length; b++) {
+            if (locLost[a] === locFound[b] || locFound[b].indexOf(locLost[a]) !== -1 || locLost[a].indexOf(locFound[b]) !== -1) {
+              if (locShared.indexOf(locLost[a]) === -1) locShared.push(locLost[a]);
+              break;
+            }
+          }
+        }
+
+        if (lostItem.location.trim() === foundItem.location.trim() || locShared.length >= 2) {
+          score += 14;
+          criteria.location = {
+            verdict: "일치",
+            cls: "verdict-match",
+            detail: "분실 장소('" + lostItem.location + "')와 발견 장소('" + foundItem.location + "') 구역이 겹칩니다."
+          };
+          reasons.push("장소 구역(" + locShared.slice(0, 2).join(", ") + ")이 서로 가깝습니다.");
+        } else if (locShared.length === 1) {
+          score += 8;
+          criteria.location = {
+            verdict: "부분 일치",
+            cls: "verdict-partial",
+            detail: "'" + locShared[0] + "' 키워드가 겹치지만 구체적인 위치가 다릅니다(" + lostItem.location + " vs " + foundItem.location + ")."
+          };
+          reasons.push("장소 설명에 공통 구역('" + locShared[0] + "')이 포함됩니다.");
+          differences.push("세부 위치가 다릅니다(" + lostItem.location + " ↔ " + foundItem.location + ").");
+        } else {
+          criteria.location = {
+            verdict: "불일치",
+            cls: "verdict-mismatch",
+            detail: "분실 장소('" + lostItem.location + "')와 발견 장소('" + foundItem.location + "')가 다릅니다. 이동 중 떨어뜨렸는지 확인하세요."
+          };
+          differences.push("장소가 다릅니다(분실: " + lostItem.location + " / 발견: " + foundItem.location + ").");
+        }
+
+        // 5. Date (분실 날짜와 발견 날짜)
+        var diffDays = computeDateDiffDays(lostItem.date, foundItem.date);
+        if (diffDays === null) {
+          criteria.date = { verdict: "확인 필요", cls: "verdict-check", detail: "날짜 정보를 비교하기 어렵습니다." };
+        } else if (diffDays < 0) {
+          score -= 10;
+          criteria.date = {
+            verdict: "불일치",
+            cls: "verdict-mismatch",
+            detail: "발견 날짜(" + foundItem.date + ")가 분실 날짜(" + lostItem.date + ")보다 " + Math.abs(diffDays) + "일 앞서 있어 날짜가 맞지 않습니다."
+          };
+          differences.push("발견 날짜가 분실 날짜보다 " + Math.abs(diffDays) + "일 더 빠릅니다(날짜 착오 여부 확인 필요).");
+        } else if (diffDays <= 3) {
+          score += 10;
+          criteria.date = {
+            verdict: "일치",
+            cls: "verdict-match",
+            detail: diffDays === 0 ? "분실 날짜와 발견 날짜가 같은 날입니다." : "분실 후 " + diffDays + "일 뒤에 발견되어 시간 흐름이 자연스럽습니다."
+          };
+          reasons.push(diffDays === 0 ? "분실일과 발견일이 같은 날(" + foundItem.date + ")입니다." : "분실 후 " + diffDays + "일 이내에 발견되었습니다.");
+        } else if (diffDays <= 10) {
+          score += 5;
+          criteria.date = {
+            verdict: "부분 일치",
+            cls: "verdict-partial",
+            detail: "분실 후 " + diffDays + "일이 지나 발견되었습니다."
+          };
+          differences.push("분실 날짜와 발견 날짜 사이에 " + diffDays + "일 간격이 있습니다.");
+        } else {
+          criteria.date = {
+            verdict: "확인 필요",
+            cls: "verdict-check",
+            detail: "분실 날짜와 발견 날짜 간격이 " + diffDays + "일로 큽니다."
+          };
+          differences.push("분실일과 발견일 차이가 " + diffDays + "일로 큽니다.");
+        }
+
+        var level =
+          score >= 68
+            ? "높은 일치 후보"
+            : score >= 38
+            ? "일부 일치 후보"
+            : "낮은 일치 참고 후보";
+
+        var levelClass =
+          score >= 68
+            ? "status-found"
+            : score >= 38
+            ? "status-searching"
+            : "status-checking";
+
+        // Concise natural Korean comparison headline (e.g., "색상은 일치하지만 발견 장소가 달라...")
+        var headlineParts = [];
+        if (criteria.color.verdict === "일치" && criteria.category.verdict === "일치") {
+          headlineParts.push("물건 종류와 색상은 일치하지만");
+        } else if (criteria.color.verdict === "일치") {
+          headlineParts.push("색상은 일치하지만");
+        } else if (criteria.category.verdict === "일치") {
+          headlineParts.push("물건 종류는 같지만");
+        } else {
+          headlineParts.push("일부 항목은 다르지만");
+        }
+
+        if (criteria.location.verdict === "불일치") {
+          headlineParts.push("장소가 서로 달라 이동 경로 확인이 필요합니다.");
+        } else if (criteria.date.verdict === "불일치") {
+          headlineParts.push("발견 날짜가 분실 날짜보다 빨라 날짜 확인이 필요합니다.");
+        } else if (differences.length === 0) {
+          headlineParts.push("5가지 기준 전반이 잘 맞아 우선 확인해볼 후보입니다.");
+        } else {
+          headlineParts.push("세부 특징과 보관 물품을 직접 대조해 확인하는 것이 좋습니다.");
+        }
+
+        if (reasons.length === 0) {
+          reasons.push("직접적으로 크게 겹치는 단서가 적어 참고용 후보로만 표시됩니다.");
+        }
+        if (differences.length === 0) {
+          differences.push("큰 불일치 항목은 없지만, 실물 확인 전까지는 본인 물건으로 단정하지 마세요.");
+        }
+
+        return {
+          foundItem: foundItem,
+          rankScore: score,
+          level: level,
+          levelClass: levelClass,
+          summaryHeadline: headlineParts.join(" "),
+          criteria: criteria,
+          reasons: reasons,
+          differences: differences,
+          verifyTip: "보관 장소(" + foundItem.location + ")에서 물건의 내부 물품이나 작은 흠집·스티커 위치를 말해 본인 확인을 진행하세요."
+        };
+      }
+
+      // Application State
+      var state = {
+        view: "home", // home | list | register | history
+        items: loadItems(),
+        analyses: loadAnalyses(),
+        registerType: "lost", // lost | found
+        registerError: "",
+        registerSuccess: "",
+        photoDraft: null, // { dataUrl, analysis }
+        filters: {
+          search: "",
+          type: "all", // all | lost | found
+          source: "all", // all | user | example
+          category: "all",
+          status: "all",
+          photoOnly: false
+        },
+        pendingDeleteId: null,
+        pendingResetExample: false,
+        pendingCardPhotoItemId: null,
+        activeAnalysis: null
+      };
+
+      var appMain = document.getElementById("appMain");
+      var loadingModal = document.getElementById("loadingModal");
+      var analysisModal = document.getElementById("analysisModal");
+      var analysisModalTitle = document.getElementById("analysisModalTitle");
+      var analysisModalSub = document.getElementById("analysisModalSub");
+      var analysisModalBody = document.getElementById("analysisModalBody");
+      var analysisModalFoot = document.getElementById("analysisModalFoot");
+      var lightboxModal = document.getElementById("lightboxModal");
+      var lightboxImg = document.getElementById("lightboxImg");
+      var lightboxTitle = document.getElementById("lightboxTitle");
+      var lightboxSub = document.getElementById("lightboxSub");
+      var lightboxCaption = document.getElementById("lightboxCaption");
+      var cardPhotoInput = document.getElementById("cardPhotoInput");
+      var toastEl = document.getElementById("toast");
+      var toastTimer = null;
+
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add("show");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          toastEl.classList.remove("show");
+        }, 2800);
+      }
+
+      function updateNavState() {
+        document.getElementById("navItemCount").textContent = String(state.items.length);
+        document.getElementById("navHistoryCount").textContent = String(state.analyses.length);
+        var navButtons = document.querySelectorAll("[data-nav]");
+        for (var i = 0; i < navButtons.length; i++) {
+          var btn = navButtons[i];
+          if (btn.getAttribute("data-nav") === state.view) {
+            btn.classList.add("active");
+          } else {
+            btn.classList.remove("active");
+          }
+        }
+      }
+
+      function getStatusClass(status) {
+        if (status === "찾음") return "status-found";
+        if (status === "확인 중") return "status-checking";
+        return "status-searching";
+      }
+
+      function setView(viewName, presetRegisterType) {
+        state.view = viewName;
+        if (presetRegisterType) {
+          state.registerType = presetRegisterType;
+        }
+        state.registerError = "";
+        state.registerSuccess = "";
+        state.pendingDeleteId = null;
+        render();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function renderHome() {
+        var lostActive = state.items.filter(function (it) {
+          return it.type === "lost" && it.status !== "찾음";
+        });
+        var foundActive = state.items.filter(function (it) {
+          return it.type === "found" && it.status !== "찾음";
+        });
+        var resolvedCount = state.items.filter(function (it) {
+          return it.status === "찾음" || it.status === "확인 중";
+        }).length;
+        var lostAll = state.items.filter(function (it) {
+          return it.type === "lost";
+        });
+
+        var optionsHtml = "";
+        for (var i = 0; i < lostAll.length; i++) {
+          var l = lostAll[i];
+          var tag = l.source === "example" ? "[예시] " : "[직접 등록] ";
+          optionsHtml +=
+            '<option value="' + escapeHtml(l.id) + '">' +
+            escapeHtml(tag + l.name + " (" + l.color + " · " + l.location + ")") +
+            "</option>";
+        }
+
+        return (
+          '<div class="section-gap">' +
+            '<section class="card hero-card">' +
+              '<div class="hero-grid">' +
+                '<div>' +
+                  '<div class="hero-eyebrow">학생 기획 · 안전한 교내·일상 분실물 연결</div>' +
+                  '<h1 class="hero-title">잃어버린 물건, 사진과 5가지 기준으로<br>비슷한 발견물 후보를 바로 찾아보세요</h1>' +
+                  '<p class="hero-desc">물건 사진만 올려도 색상과 톤을 자동으로 읽고, 종류·색상·외형 특징·장소·날짜를 비교해 일치하는 점과 다른 점을 함께 알려드립니다. 근거 없이 소유자를 단정하지 않고 확인 가능한 후보만 추천합니다.</p>' +
+                  '<div class="hero-actions">' +
+                    '<button type="button" class="btn btn-primary" id="heroGoLostBtn">분실물 등록하기</button>' +
+                    '<button type="button" class="btn btn-soft-blue" id="heroGoFoundBtn">발견물 등록하기</button>' +
+                    '<button type="button" class="btn btn-secondary" id="heroGoListBtn">등록된 물건 보기</button>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="hero-visual">' +
+                  HERO_SVG +
+                  '<div class="hero-visual-caption">' +
+                    '<span>사진 색상 분석 + 5가지 기준 비교</span>' +
+                    '<strong style="color:var(--blue);">개인정보 비공개</strong>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+            '</section>' +
+
+            '<section class="stats-grid" aria-label="현재 현황">' +
+              '<button type="button" class="stat-btn" id="statLostBtn">' +
+                '<div class="stat-label">찾고 있는 분실물</div>' +
+                '<div class="stat-value blue">' + lostActive.length + '건</div>' +
+                '<div class="stat-sub">클릭해서 분실물만 보기</div>' +
+              '</button>' +
+              '<button type="button" class="stat-btn" id="statFoundBtn">' +
+                '<div class="stat-label">보관 중인 발견물</div>' +
+                '<div class="stat-value">' + foundActive.length + '건</div>' +
+                '<div class="stat-sub">클릭해서 발견물만 보기</div>' +
+              '</button>' +
+              '<button type="button" class="stat-btn" id="statResolvedBtn">' +
+                '<div class="stat-label">확인 중 · 찾음</div>' +
+                '<div class="stat-value">' + resolvedCount + '건</div>' +
+                '<div class="stat-sub">연결 진행 및 완료 현황</div>' +
+              '</button>' +
+              '<button type="button" class="stat-btn" id="statHistoryBtn">' +
+                '<div class="stat-label">저장된 AI 분석</div>' +
+                '<div class="stat-value">' + state.analyses.length + '건</div>' +
+                '<div class="stat-sub">언제든 결과 다시 보기</div>' +
+              '</button>' +
+            '</section>' +
+
+            '<section class="home-lower-grid">' +
+              '<div class="card panel">' +
+                '<h2 class="panel-title">5가지 AI 비교 기준</h2>' +
+                '<p class="panel-sub">맞는 부분만 보여주지 않고, 일치하지 않는 정보까지 솔직하게 표시합니다.</p>' +
+                '<div class="criteria-list">' +
+                  '<div class="criteria-row"><span class="criteria-num">1</span><div><strong>물건 종류</strong><span>전자기기, 지갑·카드, 우산 등 분류가 같은지 확인합니다.</span></div></div>' +
+                  '<div class="criteria-row"><span class="criteria-num">2</span><div><strong>색상 및 사진 색감</strong><span>입력한 색상과 사진에서 추출한 대표·보조 색상을 함께 대조합니다.</span></div></div>' +
+                  '<div class="criteria-row"><span class="criteria-num">3</span><div><strong>외형과 특징</strong><span>케이스, 스티커, 손잡이, 스크래치 등 세부 단서 일치를 찾습니다.</span></div></div>' +
+                  '<div class="criteria-row"><span class="criteria-num">4</span><div><strong>분실 장소와 발견 장소</strong><span>같은 건물·구역인지, 이동 중 다른 장소에서 발견됐는지 구분합니다.</span></div></div>' +
+                  '<div class="criteria-row"><span class="criteria-num">5</span><div><strong>분실 날짜와 발견 날짜</strong><span>발견일이 분실일보다 앞서는 모순이 없는지 날짜 간격을 점검합니다.</span></div></div>' +
+                '</div>' +
+              '</div>' +
+
+              '<div class="card panel">' +
+                '<h2 class="panel-title">바로 후보 비교 체험하기</h2>' +
+                '<p class="panel-sub">등록된 분실물을 선택하면 현재 발견물 전체와 비교해 추천 이유와 차이점을 보여줍니다.</p>' +
+                '<div class="quick-test-box">' +
+                  '<label class="form-label" for="quickLostSelect">비교할 분실물 선택</label>' +
+                  '<select id="quickLostSelect" class="select" style="margin-top:6px;margin-bottom:10px;">' +
+                    (optionsHtml || '<option value="">등록된 분실물이 없습니다</option>') +
+                  '</select>' +
+                  '<div style="display:flex;flex-wrap:wrap;gap:8px;">' +
+                    '<button type="button" class="btn btn-primary btn-sm" id="quickAnalyzeBtn"' + (lostAll.length === 0 ? " disabled" : "") + '>이 분실물로 후보 찾기</button>' +
+                    '<button type="button" class="btn btn-secondary btn-sm" id="quickLastHistoryBtn"' + (state.analyses.length === 0 ? " disabled" : "") + '>최근 분석 결과 다시 보기</button>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="notice-box">' +
+                  '<strong>안전 및 개인정보 보호 안내</strong>' +
+                  '<ul>' +
+                    '<li>전화번호, 이메일, 주민등록번호 입력은 자동으로 차단됩니다.</li>' +
+                    '<li>사진 등록 시 얼굴, 학생증, 이름표 등 개인정보가 나오지 않게 찍어주세요.</li>' +
+                    '<li>예시 데이터와 내가 직접 등록한 글은 목록에서 구분되어 표시됩니다.</li>' +
+                  '</ul>' +
+                '</div>' +
+              '</div>' +
+            '</section>' +
+
+            '<section class="card panel" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;">' +
+              '<div>' +
+                '<h2 class="panel-title" style="margin-bottom:4px;">단일 index.html 파일 저장</h2>' +
+                '<p style="margin:0;font-size:13.5px;color:var(--text-muted);">프레임워크·빌드 없이 index.html 파일 하나로 구성되어 있어, 내려받아 더블 클릭하거나 GitHub·Vercel에 바로 배포할 수 있습니다.</p>' +
+              '</div>' +
+              '<div style="display:flex;flex-wrap:wrap;gap:8px;">' +
+                '<button type="button" class="btn btn-primary btn-sm" id="homeDownloadHtmlBtn">index.html 다운로드</button>' +
+                '<button type="button" class="btn btn-secondary btn-sm" id="homeCopyHtmlBtn">전체 HTML 복사</button>' +
+              '</div>' +
+            '</section>' +
+          '</div>'
+        );
+      }
+
+      function renderRegister() {
+        var isLost = state.registerType === "lost";
+        var today = getRelativeDate(0);
+        var categoryOptions = "";
+        for (var i = 0; i < CATEGORIES.length; i++) {
+          categoryOptions += '<option value="' + escapeHtml(CATEGORIES[i]) + '">' + escapeHtml(CATEGORIES[i]) + "</option>";
+        }
+
+        var photoPreviewHtml = "";
+        if (state.photoDraft && sanitizeImageUrl(state.photoDraft.dataUrl)) {
+          var pa = state.photoDraft.analysis;
+          photoPreviewHtml =
+            '<div class="photo-preview-row">' +
+              '<img src="' + sanitizeImageUrl(state.photoDraft.dataUrl) + '" alt="업로드한 물건 사진 미리보기" class="photo-thumb-lg" />' +
+              '<div>' +
+                '<div style="font-size:14px;font-weight:700;color:var(--blue-hover);">AI 사진 색상·외형 분석 완료</div>' +
+                '<div class="swatch-row">' +
+                  '<span class="color-dot" style="background:' + escapeHtml(pa.rgbHex) + ';"></span>' +
+                  '<strong>대표 색상:</strong> ' + escapeHtml(pa.dominantColor) +
+                  (pa.secondaryColor ? " · <strong>보조:</strong> " + escapeHtml(pa.secondaryColor) : "") +
+                  " · " + escapeHtml(pa.tone) +
+                '</div>' +
+                '<p style="margin:0 0 10px;font-size:13px;color:var(--text-secondary);">' + escapeHtml(pa.summary) + "</p>" +
+                '<div style="display:flex;flex-wrap:wrap;gap:8px;">' +
+                  '<button type="button" class="btn btn-primary btn-sm" id="previewPhotoMatchBtn">이 사진으로 후보 미리 찾기</button>' +
+                  '<button type="button" class="btn btn-soft-blue btn-sm" id="applyPhotoAnalysisBtn">AI 분석 다시 적용</button>' +
+                  '<button type="button" class="btn btn-secondary btn-sm" id="removeDraftPhotoBtn">사진 빼기</button>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+        }
+
+        return (
+          '<div class="register-wrap">' +
+            '<div class="card panel">' +
+              '<h1 style="margin:0 0 6px;font-size:22px;">물건 등록하기</h1>' +
+              '<p style="margin:0 0 18px;font-size:14px;color:var(--text-muted);">사진을 먼저 올리면 색상과 외형 톤을 자동으로 읽어 빈칸에 채워드립니다. 등록 후에도 브라우저에 안전하게 저장됩니다.</p>' +
+
+              '<div class="segmented" role="tablist" aria-label="등록 유형 선택">' +
+                '<button type="button" class="seg-btn ' + (isLost ? "active" : "") + '" id="segLostBtn">잃어버렸어요 (분실물)</button>' +
+                '<button type="button" class="seg-btn ' + (!isLost ? "active" : "") + '" id="segFoundBtn">주웠어요 (발견물)</button>' +
+              '</div>' +
+
+              (state.registerError
+                ? '<div class="alert alert-error" style="margin-bottom:16px;">' + escapeHtml(state.registerError) + "</div>"
+                : "") +
+              (state.registerSuccess
+                ? '<div class="alert alert-success" style="margin-bottom:16px;">' + escapeHtml(state.registerSuccess) + "</div>"
+                : "") +
+
+              '<form id="registerForm" novalidate>' +
+                '<div class="photo-box" style="margin-bottom:18px;">' +
+                  '<div style="font-size:14px;font-weight:700;color:var(--text);">1. 물건 사진 올리기 (선택 · 자동 색상 분석)</div>' +
+                  '<div class="field-hint" style="margin-top:4px;">사진을 선택하면 색상과 겉모습 특징을 자동으로 읽어냅니다. 얼굴·학생증·연락처가 나오지 않게 찍어주세요.</div>' +
+                  '<div class="photo-actions">' +
+                    '<label class="btn btn-soft-blue btn-sm" for="regPhotoUpload" style="cursor:pointer;">앨범 / 파일에서 사진 선택</label>' +
+                    '<input type="file" id="regPhotoUpload" accept="image/*" class="sr-only" />' +
+                    '<label class="btn btn-secondary btn-sm" for="regPhotoCamera" style="cursor:pointer;">카메라로 찍기</label>' +
+                    '<input type="file" id="regPhotoCamera" accept="image/*" capture="environment" class="sr-only" />' +
+                  '</div>' +
+                  photoPreviewHtml +
+                '</div>' +
+
+                '<div class="form-grid">' +
+                  '<div class="form-group">' +
+                    '<label class="form-label" for="itemName">물건 이름 <span class="required-dot">*</span></label>' +
+                    '<input id="itemName" name="name" type="text" class="input" maxlength="50" placeholder="' + (isLost ? "예: 검정색 무선 이어폰" : "예: 흰색 접이식 우산") + '" required />' +
+                  '</div>' +
+                  '<div class="form-group">' +
+                    '<label class="form-label" for="itemCategory">물건 종류 <span class="required-dot">*</span></label>' +
+                    '<select id="itemCategory" name="category" class="select">' + categoryOptions + "</select>" +
+                  '</div>' +
+                  '<div class="form-group">' +
+                    '<label class="form-label" for="itemColor">색상 <span class="required-dot">*</span></label>' +
+                    '<input id="itemColor" name="color" type="text" class="input" maxlength="30" placeholder="예: 남색, 흰색, 은색 등 (사진 등록 시 자동 입력)" required />' +
+                  '</div>' +
+                  '<div class="form-group">' +
+                    '<label class="form-label" for="itemDate">' + (isLost ? "분실 날짜" : "발견 날짜") + ' <span class="required-dot">*</span></label>' +
+                    '<input id="itemDate" name="date" type="date" class="input tabular" max="' + today + '" value="' + today + '" required />' +
+                  '</div>' +
+                  '<div class="form-group full">' +
+                    '<label class="form-label" for="itemLocation">' + (isLost ? "분실 장소" : "발견 및 보관 장소") + ' <span class="required-dot">*</span></label>' +
+                    '<input id="itemLocation" name="location" type="text" class="input" maxlength="80" placeholder="' + (isLost ? "예: 본관 3층 영어실 앞 복도" : "예: 체육관 입구에서 발견 → 2층 교무실 보관") + '" required />' +
+                  '</div>' +
+                  '<div class="form-group full">' +
+                    '<label class="form-label" for="itemFeatures">외형과 특징 <span class="required-dot">*</span></label>' +
+                    '<textarea id="itemFeatures" name="features" class="textarea" maxlength="300" placeholder="스티커, 케이스 모양, 흠집, 브랜드, 고리 장식 등 알아볼 수 있는 특징을 5자 이상 적어주세요. (전화번호·이메일 등 개인정보 입력 금지)" required></textarea>' +
+                    '<div class="field-hint">개인정보 보호를 위해 연락처·이름·주민번호는 적지 마세요.</div>' +
+                  '</div>' +
+                '</div>' +
+
+                '<div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;">' +
+                  '<button type="button" class="btn btn-secondary" id="regCancelBtn">목록으로</button>' +
+                  (isLost
+                    ? '<button type="submit" class="btn btn-soft-blue" data-submit-mode="save">분실물만 등록</button>' +
+                      '<button type="submit" class="btn btn-primary" data-submit-mode="analyze">등록하고 추천 후보 보기</button>'
+                    : '<button type="submit" class="btn btn-primary" data-submit-mode="save">발견물 등록하기</button>') +
+                '</div>' +
+              '</form>' +
+            '</div>' +
+          '</div>'
+        );
+      }
+
+      function getFilteredItems() {
+        var q = state.filters.search.trim().toLowerCase();
+        return state.items
+          .slice()
+          .sort(function (a, b) {
+            return (b.createdAt || 0) - (a.createdAt || 0);
+          })
+          .filter(function (item) {
+            if (state.filters.type !== "all" && item.type !== state.filters.type) return false;
+            if (state.filters.source !== "all" && item.source !== state.filters.source) return false;
+            if (state.filters.category !== "all" && item.category !== state.filters.category) return false;
+            if (state.filters.status === "확인 중·찾음") {
+              if (item.status !== "확인 중" && item.status !== "찾음") return false;
+            } else if (state.filters.status !== "all" && item.status !== state.filters.status) {
+              return false;
+            }
+            if (state.filters.photoOnly && !sanitizeImageUrl(item.photoDataUrl)) return false;
+            if (q) {
+              var hay = [
+                item.name,
+                item.category,
+                item.color,
+                item.location,
+                item.features,
+                item.photoAnalysis ? item.photoAnalysis.summary : ""
+              ]
+                .join(" ")
+                .toLowerCase();
+              if (hay.indexOf(q) === -1) return false;
+            }
+            return true;
+          });
+      }
+
+      function renderDirectoryResultsMarkup() {
+        var filtered = getFilteredItems();
+        var cardsHtml = "";
+        if (filtered.length === 0) {
+          cardsHtml =
+            '<div class="card empty-state">' +
+              '<h3>조건에 맞는 물건이 없어요</h3>' +
+              '<p style="margin:0 0 16px;font-size:14px;">검색어나 필터를 바꾸거나 새로운 분실물·발견물을 등록해보세요.</p>' +
+              '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">' +
+                '<button type="button" class="btn btn-secondary btn-sm" id="resetFiltersBtn">필터 초기화</button>' +
+                '<button type="button" class="btn btn-primary btn-sm" id="emptyRegisterBtn">새 물건 등록하기</button>' +
+              '</div>' +
+            '</div>';
+        } else {
+          cardsHtml = '<div class="item-grid">';
+          for (var k = 0; k < filtered.length; k++) {
+            var it = filtered[k];
+            var isLost = it.type === "lost";
+            var isUser = it.source === "user";
+            var photoUrl = sanitizeImageUrl(it.photoDataUrl);
+            var itemAnalyses = state.analyses.filter(function (an) {
+              return an.lostItemId === it.id;
+            });
+
+            var statusChoices = isLost ? ["찾는 중", "확인 중", "찾음"] : ["보관 중", "확인 중", "찾음"];
+            var statusBtnsHtml = "";
+            for (var sc = 0; sc < statusChoices.length; sc++) {
+              var ch = statusChoices[sc];
+              statusBtnsHtml +=
+                '<button type="button" class="status-choice ' +
+                (it.status === ch ? "active" : "") +
+                '" data-action="set-status" data-id="' + escapeHtml(it.id) + '" data-status="' + escapeHtml(ch) + '">' +
+                escapeHtml(ch) +
+                "</button>";
+            }
+
+            var deleteControlHtml = "";
+            if (isUser) {
+              if (state.pendingDeleteId === it.id) {
+                deleteControlHtml =
+                  '<button type="button" class="btn btn-danger-ghost btn-sm" data-action="confirm-delete" data-id="' + escapeHtml(it.id) + '">정말 삭제할까요?</button>' +
+                  '<button type="button" class="btn btn-secondary btn-sm" data-action="cancel-delete">취소</button>';
+              } else {
+                deleteControlHtml =
+                  '<button type="button" class="btn btn-secondary btn-sm" data-action="ask-delete" data-id="' + escapeHtml(it.id) + '">삭제</button>';
+              }
+            }
+
+            cardsHtml +=
+              '<article class="card item-card">' +
+                '<div class="item-head">' +
+                  '<div>' +
+                    '<div class="item-meta-line">' +
+                      '<span class="' + (isLost ? "meta-type-lost" : "meta-type-found") + '">' + (isLost ? "분실물" : "발견물") + "</span>" +
+                      '<span>·</span>' +
+                      '<span>' + escapeHtml(it.category) + "</span>" +
+                      '<span>·</span>' +
+                      '<span class="' + (isUser ? "meta-source-user" : "") + '">' + (isUser ? "직접 등록" : "예시 데이터") + "</span>" +
+                    '</div>' +
+                    '<h3 class="item-title">' + escapeHtml(it.name) + "</h3>" +
+                  '</div>' +
+                  '<span class="status-text ' + getStatusClass(it.status) + '">' + escapeHtml(it.status) + "</span>" +
+                '</div>' +
+
+                '<div class="item-body">' +
+                  (photoUrl
+                    ? '<button type="button" class="item-thumb-btn" data-action="open-lightbox" data-id="' + escapeHtml(it.id) + '" aria-label="' + escapeHtml(it.name) + ' 사진 크게 보기">' +
+                        '<img src="' + photoUrl + '" alt="' + escapeHtml(it.name) + ' 사진" />' +
+                        '<span class="item-thumb-zoom" aria-hidden="true">↗</span>' +
+                      "</button>"
+                    : "") +
+                  '<div class="item-facts">' +
+                    '<div class="fact-line"><strong>색상</strong>' + escapeHtml(it.color) + "</div>" +
+                    '<div class="fact-line"><strong>' + (isLost ? "분실 장소" : "발견·보관") + '</strong>' + escapeHtml(it.location) + "</div>" +
+                    '<div class="fact-line tabular"><strong>' + (isLost ? "분실 날짜" : "발견 날짜") + '</strong>' + escapeHtml(it.date) + "</div>" +
+                  '</div>' +
+                '</div>' +
+
+                '<p class="item-features">' + escapeHtml(it.features) + "</p>" +
+
+                (it.photoAnalysis && it.photoAnalysis.summary
+                  ? '<div class="item-photo-note">' +
+                      '<span class="color-dot" style="background:' + escapeHtml(it.photoAnalysis.rgbHex || "#cbd5e1") + ';margin-right:6px;"></span>' +
+                      escapeHtml(it.photoAnalysis.summary) +
+                    "</div>"
+                  : "") +
+
+                '<div class="item-footer">' +
+                  '<div class="status-controls">' +
+                    '<span class="status-label">상태 변경</span>' +
+                    statusBtnsHtml +
+                  '</div>' +
+                  '<div class="card-actions">' +
+                    (isLost
+                      ? '<button type="button" class="btn btn-primary btn-sm" data-action="analyze-item" data-id="' + escapeHtml(it.id) + '">후보 찾기</button>'
+                      : "") +
+                    (isLost && itemAnalyses.length > 0
+                      ? '<button type="button" class="btn btn-soft-blue btn-sm" data-action="view-last-analysis" data-id="' + escapeHtml(it.id) + '">이전 분석 (' + itemAnalyses.length + ")</button>"
+                      : "") +
+                    (isUser
+                      ? '<button type="button" class="btn btn-secondary btn-sm" data-action="attach-card-photo" data-id="' + escapeHtml(it.id) + '">' + (photoUrl ? "사진 변경" : "사진 추가") + "</button>"
+                      : "") +
+                    (isUser && photoUrl
+                      ? '<button type="button" class="btn btn-secondary btn-sm" data-action="remove-card-photo" data-id="' + escapeHtml(it.id) + '">사진 삭제</button>'
+                      : "") +
+                    deleteControlHtml +
+                  '</div>' +
+                '</div>' +
+              "</article>";
+          }
+          cardsHtml += "</div>";
+        }
+
+        return '<div style="font-size:13.5px;color:var(--text-muted);font-weight:600;margin-bottom:14px;" class="tabular">검색 결과 ' + filtered.length + "건</div>" + cardsHtml;
+      }
+
+      function renderDirectory() {
+        var catOpts = '<option value="all">전체 종류</option>';
+        for (var i = 0; i < CATEGORIES.length; i++) {
+          var c = CATEGORIES[i];
+          catOpts += '<option value="' + escapeHtml(c) + '"' + (state.filters.category === c ? " selected" : "") + ">" + escapeHtml(c) + "</option>";
+        }
+
+        var statusList = ["찾는 중", "보관 중", "확인 중", "찾음", "확인 중·찾음"];
+        var statusOpts = '<option value="all">전체 상태</option>';
+        for (var s = 0; s < statusList.length; s++) {
+          var st = statusList[s];
+          statusOpts += '<option value="' + escapeHtml(st) + '"' + (state.filters.status === st ? " selected" : "") + ">" + escapeHtml(st) + "</option>";
+        }
+
+        return (
+          '<div class="section-gap">' +
+            '<section class="card toolbar">' +
+              '<div class="toolbar-top">' +
+                '<div class="search-wrap">' +
+                  '<span class="search-icon" aria-hidden="true">' +
+                    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>' +
+                  '</span>' +
+                  '<input id="searchInput" type="search" class="input search-input" value="' + escapeHtml(state.filters.search) + '" placeholder="물건 이름, 색상, 장소, 특징으로 검색하세요..." aria-label="물건 검색" />' +
+                '</div>' +
+                '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' +
+                  (state.pendingResetExample
+                    ? '<button type="button" class="btn btn-danger-ghost btn-sm" id="confirmResetExampleBtn">예시만 초기 상태로 복원</button>' +
+                      '<button type="button" class="btn btn-secondary btn-sm" id="cancelResetExampleBtn">취소</button>'
+                    : '<button type="button" class="btn btn-secondary btn-sm" id="askResetExampleBtn">예시 데이터 초기화</button>') +
+                  '<button type="button" class="btn btn-primary btn-sm" id="dirNewRegisterBtn">+ 새 물건 등록</button>' +
+                '</div>' +
+              '</div>' +
+
+              '<div class="filter-row">' +
+                '<div style="display:flex;flex-wrap:wrap;gap:8px;">' +
+                  '<div class="tab-group" role="group" aria-label="분실물 발견물 구분">' +
+                    '<button type="button" class="tab-btn ' + (state.filters.type === "all" ? "active" : "") + '" data-filter-type="all">전체</button>' +
+                    '<button type="button" class="tab-btn ' + (state.filters.type === "lost" ? "active" : "") + '" data-filter-type="lost">분실물</button>' +
+                    '<button type="button" class="tab-btn ' + (state.filters.type === "found" ? "active" : "") + '" data-filter-type="found">발견물</button>' +
+                  '</div>' +
+                  '<div class="tab-group" role="group" aria-label="등록 출처 구분">' +
+                    '<button type="button" class="tab-btn ' + (state.filters.source === "all" ? "active" : "") + '" data-filter-source="all">전체 출처</button>' +
+                    '<button type="button" class="tab-btn ' + (state.filters.source === "user" ? "active" : "") + '" data-filter-source="user">직접 등록</button>' +
+                    '<button type="button" class="tab-btn ' + (state.filters.source === "example" ? "active" : "") + '" data-filter-source="example">예시 데이터</button>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="filter-selects">' +
+                  '<select id="categoryFilter" class="select select-sm" aria-label="물건 종류 필터">' + catOpts + "</select>" +
+                  '<select id="statusFilter" class="select select-sm" aria-label="상태 필터">' + statusOpts + "</select>" +
+                  '<label class="checkbox-label">' +
+                    '<input type="checkbox" id="photoOnlyFilter"' + (state.filters.photoOnly ? " checked" : "") + ' />' +
+                    '<span>사진 있는 글만</span>' +
+                  '</label>' +
+                '</div>' +
+              '</div>' +
+            '</section>' +
+            '<div id="directoryResults">' + renderDirectoryResultsMarkup() + '</div>' +
+          '</div>'
+        );
+      }
+
+
+
+      function renderHistory() {
+        if (state.analyses.length === 0) {
+          return (
+            '<div class="card empty-state">' +
+              '<h3>아직 저장된 AI 분석 기록이 없어요</h3>' +
+              '<p style="margin:0 0 16px;font-size:14px;">물건 목록에서 분실물의 &ldquo;후보 찾기&rdquo; 버튼을 누르면 5가지 기준 비교 결과가 여기에 저장됩니다.</p>' +
+              '<button type="button" class="btn btn-primary btn-sm" id="historyGoListBtn">분실물 목록 보러가기</button>' +
+            '</div>'
+          );
+        }
+
+        var html = '<div class="section-gap"><div class="card panel" style="padding:20px 24px;"><h1 style="margin:0 0 4px;font-size:21px;">저장된 AI 분석 기록</h1><p style="margin:0;font-size:13.5px;color:var(--text-muted);">이전에 비교했던 추천 이유와 차이점 결과를 언제든 다시 확인할 수 있습니다.</p></div><div class="history-list">';
+        for (var i = 0; i < state.analyses.length; i++) {
+          var rec = state.analyses[i];
+          var d = new Date(rec.createdAt);
+          var timeStr =
+            d.getFullYear() +
+            "." +
+            String(d.getMonth() + 1).padStart(2, "0") +
+            "." +
+            String(d.getDate()).padStart(2, "0") +
+            " " +
+            String(d.getHours()).padStart(2, "0") +
+            ":" +
+            String(d.getMinutes()).padStart(2, "0");
+          var topCand = rec.candidates && rec.candidates[0];
+          html +=
+            '<article class="card history-card">' +
+              '<div style="flex:1 1 320px;">' +
+                '<div class="item-meta-line tabular">' +
+                  '<span>분석 시각 ' + escapeHtml(timeStr) + "</span>" +
+                  '<span>·</span>' +
+                  '<span>비교한 발견물 ' + rec.comparedCount + "건</span>" +
+                  '<span>·</span>' +
+                  '<span>추천 후보 ' + rec.candidates.length + "건</span>" +
+                '</div>' +
+                '<h3 style="margin:2px 0 6px;font-size:17px;">' + escapeHtml(rec.lostSnapshot.name) + ' <span style="font-size:13.5px;font-weight:500;color:var(--text-muted);">(' + escapeHtml(rec.lostSnapshot.color) + " · " + escapeHtml(rec.lostSnapshot.location) + ")</span></h3>" +
+                (topCand
+                  ? '<p style="margin:0;font-size:13.5px;color:var(--text-secondary);">최우선 후보: <strong>' + escapeHtml(topCand.foundItem.name) + "</strong> — " + escapeHtml(topCand.summaryHeadline) + "</p>"
+                  : '<p style="margin:0;font-size:13.5px;color:var(--text-muted);">뚜렷하게 일치하는 후보가 없었습니다.</p>') +
+              '</div>' +
+              '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+                '<button type="button" class="btn btn-primary btn-sm" data-action="open-history-record" data-history-id="' + escapeHtml(rec.id) + '">결과 다시 보기</button>' +
+                '<button type="button" class="btn btn-secondary btn-sm" data-action="delete-history-record" data-history-id="' + escapeHtml(rec.id) + '">기록 삭제</button>' +
+              '</div>' +
+            "</article>";
+        }
+        html += "</div></div>";
+        return html;
+      }
+
+      function render() {
+        updateNavState();
+        if (state.view === "home") {
+          appMain.innerHTML = renderHome();
+          bindHomeEvents();
+        } else if (state.view === "register") {
+          appMain.innerHTML = renderRegister();
+          bindRegisterEvents();
+        } else if (state.view === "list") {
+          appMain.innerHTML = renderDirectory();
+          bindDirectoryEvents();
+        } else if (state.view === "history") {
+          appMain.innerHTML = renderHistory();
+          bindHistoryEvents();
+        }
+      }
+
+      // Analysis Modal & Actions
+      function runAnalysisForLostItem(lostId) {
+        var lostItem = null;
+        for (var i = 0; i < state.items.length; i++) {
+          if (state.items[i].id === lostId) {
+            lostItem = state.items[i];
+            break;
+          }
+        }
+        if (!lostItem) {
+          showToast("선택한 분실물을 찾을 수 없습니다.");
+          return;
+        }
+
+        var foundItems = state.items.filter(function (it) {
+          return it.type === "found";
+        });
+
+        loadingModal.classList.add("open");
+
+        setTimeout(function () {
+          var evaluated = foundItems
+            .map(function (f) {
+              return compareLostWithFound(lostItem, f);
+            })
+            .sort(function (a, b) {
+              return b.rankScore - a.rankScore;
+            });
+
+          var record = {
+            id: "an-" + Date.now(),
+            createdAt: Date.now(),
+            lostItemId: lostItem.id,
+            lostSnapshot: {
+              id: lostItem.id,
+              name: lostItem.name,
+              category: lostItem.category,
+              color: lostItem.color,
+              location: lostItem.location,
+              date: lostItem.date,
+              features: lostItem.features,
+              photoDataUrl: lostItem.photoDataUrl || "",
+              photoAnalysis: lostItem.photoAnalysis || null
+            },
+            comparedCount: foundItems.length,
+            candidates: evaluated.slice(0, 4)
+          };
+
+          state.analyses.unshift(record);
+          saveAnalyses(state.analyses);
+          loadingModal.classList.remove("open");
+          updateNavState();
+          openAnalysisRecord(record);
+        }, 550);
+      }
+
+      function openAnalysisRecord(record) {
+        state.activeAnalysis = record;
+        var currentLost = null;
+        for (var i = 0; i < state.items.length; i++) {
+          if (state.items[i].id === record.lostItemId) {
+            currentLost = state.items[i];
+            break;
+          }
+        }
+        var lostSnap = currentLost || record.lostSnapshot;
+
+        analysisModalTitle.textContent = "‘" + lostSnap.name + "’ 연결 후보 추천";
+        analysisModalSub.textContent =
+          lostSnap.category + " · " + lostSnap.color + " · 분실: " + lostSnap.location + " (" + lostSnap.date + ")";
+
+        var bodyHtml =
+          '<div class="alert alert-info">' +
+            '<div>' +
+              '<strong>안내: AI 분석은 후보 추천일 뿐 소유자를 단정하지 않습니다.</strong><br>' +
+              '일치하는 점과 함께 <strong>일치하지 않는 정보(장소, 날짜, 색감 차이 등)</strong>도 반드시 확인한 뒤 보관 장소에서 실물 대조를 진행하세요.' +
+            '</div>' +
+          '</div>';
+
+        if (!record.candidates || record.candidates.length === 0) {
+          bodyHtml +=
+            '<div class="card empty-state">' +
+              '<h3>비교할 수 있는 발견물이 아직 없습니다</h3>' +
+              '<p style="margin:0;font-size:14px;">발견물이 등록되면 5가지 기준 비교를 바로 실행할 수 있습니다.</p>' +
+            '</div>';
+        } else {
+          for (var c = 0; c < record.candidates.length; c++) {
+            var cand = record.candidates[c];
+            var f = cand.foundItem;
+            var lostPhoto = sanitizeImageUrl(lostSnap.photoDataUrl);
+            var foundPhoto = sanitizeImageUrl(f.photoDataUrl);
+
+            var photoCompareHtml = "";
+            if (lostPhoto || foundPhoto) {
+              photoCompareHtml =
+                '<div class="photo-compare-grid">' +
+                  '<div class="photo-compare-box">' +
+                    (lostPhoto
+                      ? '<img src="' + lostPhoto + '" alt="분실물 사진" />'
+                      : '<div style="width:68px;height:68px;border-radius:6px;background:var(--surface-soft);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted);flex-shrink:0;">사진 없음</div>') +
+                    '<div style="font-size:12.5px;"><strong>분실물 사진</strong><div style="color:var(--text-muted);margin-top:2px;">' +
+                      escapeHtml(lostSnap.photoAnalysis ? lostSnap.photoAnalysis.dominantColor + " · " + lostSnap.photoAnalysis.tone : "입력 색상: " + lostSnap.color) +
+                    "</div></div>" +
+                  "</div>" +
+                  '<div class="photo-compare-box">' +
+                    (foundPhoto
+                      ? '<img src="' + foundPhoto + '" alt="발견물 사진" />'
+                      : '<div style="width:68px;height:68px;border-radius:6px;background:var(--surface-soft);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted);flex-shrink:0;">사진 없음</div>') +
+                    '<div style="font-size:12.5px;"><strong>발견물 사진</strong><div style="color:var(--text-muted);margin-top:2px;">' +
+                      escapeHtml(f.photoAnalysis ? f.photoAnalysis.dominantColor + " · " + f.photoAnalysis.tone : "입력 색상: " + f.color) +
+                    "</div></div>" +
+                  "</div>" +
+                "</div>";
+            }
+
+            var reasonsLis = cand.reasons.map(function (r) { return "<li>" + escapeHtml(r) + "</li>"; }).join("");
+            var diffLis = cand.differences.map(function (d) { return "<li>" + escapeHtml(d) + "</li>"; }).join("");
+
+            bodyHtml +=
+              '<article class="candidate-card">' +
+                '<div class="candidate-head">' +
+                  '<div>' +
+                    '<div style="font-size:12.5px;font-weight:700;color:var(--text-muted);margin-bottom:2px;">추천 후보 #' + (c + 1) + " · " + (f.source === "example" ? "예시 발견물" : "직접 등록 발견물") + "</div>" +
+                    '<h3 style="margin:0;font-size:18px;">' + escapeHtml(f.name) + '</h3>' +
+                    '<div style="font-size:13px;color:var(--text-secondary);margin-top:3px;">보관/발견: ' + escapeHtml(f.location) + " · " + escapeHtml(f.date) + "</div>" +
+                  '</div>' +
+                  '<span class="status-text ' + cand.levelClass + '">' + escapeHtml(cand.level) + "</span>" +
+                '</div>' +
+
+                '<div style="padding:10px 12px;border-radius:8px;background:var(--surface-blue);border:1px solid var(--blue-border);font-size:13.5px;font-weight:600;color:var(--blue-deep);">' +
+                  '비교 이유 한눈에 보기: ' + escapeHtml(cand.summaryHeadline) +
+                '</div>' +
+
+                photoCompareHtml +
+
+                '<table class="criteria-table">' +
+                  '<tbody>' +
+                    '<tr><th>1. 물건 종류</th><td><span class="verdict-badge ' + cand.criteria.category.cls + '">' + escapeHtml(cand.criteria.category.verdict) + '</span>' + escapeHtml(cand.criteria.category.detail) + '</td></tr>' +
+                    '<tr><th>2. 색상</th><td><span class="verdict-badge ' + cand.criteria.color.cls + '">' + escapeHtml(cand.criteria.color.verdict) + '</span>' + escapeHtml(cand.criteria.color.detail) + '</td></tr>' +
+                    '<tr><th>3. 외형과 특징</th><td><span class="verdict-badge ' + cand.criteria.features.cls + '">' + escapeHtml(cand.criteria.features.verdict) + '</span>' + escapeHtml(cand.criteria.features.detail) + '</td></tr>' +
+                    '<tr><th>4. 장소</th><td><span class="verdict-badge ' + cand.criteria.location.cls + '">' + escapeHtml(cand.criteria.location.verdict) + '</span>' + escapeHtml(cand.criteria.location.detail) + '</td></tr>' +
+                    '<tr><th>5. 날짜</th><td><span class="verdict-badge ' + cand.criteria.date.cls + '">' + escapeHtml(cand.criteria.date.verdict) + '</span>' + escapeHtml(cand.criteria.date.detail) + '</td></tr>' +
+                  '</tbody>' +
+                '</table>' +
+
+                '<div class="pros-cons-grid">' +
+                  '<div class="reason-box match-box"><h5>추천 이유 (일치하는 점)</h5><ul>' + reasonsLis + '</ul></div>' +
+                  '<div class="reason-box diff-box"><h5>차이점 및 확인할 점 (일치하지 않는 정보)</h5><ul>' + diffLis + '</ul></div>' +
+                '</div>' +
+
+                '<div style="font-size:13px;color:var(--text-secondary);padding-top:4px;">' +
+                  '<strong>확인 팁:</strong> ' + escapeHtml(cand.verifyTip) +
+                '</div>' +
+              "</article>";
+          }
+        }
+
+        analysisModalBody.innerHTML = bodyHtml;
+
+        if (currentLost && currentLost.type === "lost") {
+          var statuses = ["찾는 중", "확인 중", "찾음"];
+          var btns = statuses
+            .map(function (st) {
+              return (
+                '<button type="button" class="status-choice ' +
+                (currentLost.status === st ? "active" : "") +
+                '" data-modal-status="' + escapeHtml(st) + '">' +
+                escapeHtml(st) +
+                "</button>"
+              );
+            })
+            .join("");
+          analysisModalFoot.innerHTML =
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+              '<span style="font-size:13px;font-weight:600;color:var(--text-secondary);">이 분실물 상태 변경:</span>' +
+              btns +
+            "</div>" +
+            '<button type="button" class="btn btn-primary btn-sm" id="modalDoneBtn">확인 완료</button>';
+
+          var modalStatusBtns = analysisModalFoot.querySelectorAll("[data-modal-status]");
+          for (var b = 0; b < modalStatusBtns.length; b++) {
+            modalStatusBtns[b].addEventListener("click", function () {
+              var nextStatus = this.getAttribute("data-modal-status");
+              updateItemStatus(currentLost.id, nextStatus);
+              openAnalysisRecord(record);
+            });
+          }
+          document.getElementById("modalDoneBtn").addEventListener("click", closeAnalysisModal);
+        } else {
+          analysisModalFoot.innerHTML =
+            '<span style="font-size:13px;color:var(--text-muted);">저장된 스냅샷 기록을 보고 있습니다.</span>' +
+            '<button type="button" class="btn btn-primary btn-sm" id="modalDoneBtn">닫기</button>';
+          document.getElementById("modalDoneBtn").addEventListener("click", closeAnalysisModal);
+        }
+
+        analysisModal.classList.add("open");
+      }
+
+      function closeAnalysisModal() {
+        analysisModal.classList.remove("open");
+      }
+
+      function openLightbox(item) {
+        var safeUrl = sanitizeImageUrl(item.photoDataUrl);
+        if (!safeUrl) return;
+        lightboxTitle.textContent = item.name;
+        lightboxSub.textContent = (item.type === "lost" ? "분실물" : "발견물") + " · " + item.color + " · " + item.location;
+        lightboxImg.src = safeUrl;
+        lightboxCaption.textContent = item.photoAnalysis && item.photoAnalysis.summary
+          ? item.photoAnalysis.summary
+          : item.features;
+        lightboxModal.classList.add("open");
+      }
+
+      function updateItemStatus(itemId, nextStatus) {
+        for (var i = 0; i < state.items.length; i++) {
+          if (state.items[i].id === itemId) {
+            state.items[i].status = nextStatus;
+            break;
+          }
+        }
+        saveItems(state.items);
+        showToast("상태가 '" + nextStatus + "'(으)로 변경되었습니다.");
+        render();
+      }
+
+      // Event Bindings Per View
+      function bindHomeEvents() {
+        document.getElementById("heroGoLostBtn").addEventListener("click", function () {
+          setView("register", "lost");
+        });
+        document.getElementById("heroGoFoundBtn").addEventListener("click", function () {
+          setView("register", "found");
+        });
+        document.getElementById("heroGoListBtn").addEventListener("click", function () {
+          state.filters.type = "all";
+          state.filters.status = "all";
+          setView("list");
+        });
+        document.getElementById("statLostBtn").addEventListener("click", function () {
+          state.filters.type = "lost";
+          state.filters.status = "all";
+          setView("list");
+        });
+        document.getElementById("statFoundBtn").addEventListener("click", function () {
+          state.filters.type = "found";
+          state.filters.status = "all";
+          setView("list");
+        });
+        document.getElementById("statResolvedBtn").addEventListener("click", function () {
+          state.filters.type = "all";
+          state.filters.status = "확인 중·찾음";
+          setView("list");
+        });
+        document.getElementById("statHistoryBtn").addEventListener("click", function () {
+          setView("history");
+        });
+
+        var quickAnalyzeBtn = document.getElementById("quickAnalyzeBtn");
+        if (quickAnalyzeBtn) {
+          quickAnalyzeBtn.addEventListener("click", function () {
+            var sel = document.getElementById("quickLostSelect");
+            if (sel && sel.value) runAnalysisForLostItem(sel.value);
+          });
+        }
+        var quickLastBtn = document.getElementById("quickLastHistoryBtn");
+        if (quickLastBtn) {
+          quickLastBtn.addEventListener("click", function () {
+            if (state.analyses.length > 0) openAnalysisRecord(state.analyses[0]);
+          });
+        }
+        var homeDownloadBtn = document.getElementById("homeDownloadHtmlBtn");
+        if (homeDownloadBtn) {
+          homeDownloadBtn.addEventListener("click", downloadStandaloneIndexHtml);
+        }
+        var homeCopyBtn = document.getElementById("homeCopyHtmlBtn");
+        if (homeCopyBtn) {
+          homeCopyBtn.addEventListener("click", copyStandaloneIndexHtml);
+        }
+      }
+
+      function applyPhotoToRegisterForm(overwrite) {
+        if (!state.photoDraft || !state.photoDraft.analysis) return;
+        var pa = state.photoDraft.analysis;
+        var colorInput = document.getElementById("itemColor");
+        var featuresInput = document.getElementById("itemFeatures");
+        if (colorInput && (overwrite || !colorInput.value.trim())) {
+          colorInput.value = pa.dominantColor;
+        }
+        if (featuresInput && (overwrite || !featuresInput.value.trim())) {
+          featuresInput.value =
+            pa.dominantColor +
+            (pa.secondaryColor ? "과 " + pa.secondaryColor + " 조합, " : " 계열, ") +
+            pa.tone +
+            "의 " +
+            pa.shapeNote +
+            "입니다.";
+        }
+      }
+
+      function handleRegisterPhotoSelect(file) {
+        if (!file) return;
+        processImageFile(file)
+          .then(function (result) {
+            state.photoDraft = result;
+            state.registerError = "";
+            // Preserve user's currently typed fields before re-rendering
+            var snapshot = captureRegisterFormValues();
+            render();
+            restoreRegisterFormValues(snapshot);
+            applyPhotoToRegisterForm(false);
+            showToast("사진에서 '" + result.analysis.dominantColor + "' 색상을 읽었습니다.");
+          })
+          .catch(function (err) {
+            state.registerError = err.message || "사진 처리에 실패했습니다.";
+            var snapshot = captureRegisterFormValues();
+            render();
+            restoreRegisterFormValues(snapshot);
+          });
+      }
+
+      function captureRegisterFormValues() {
+        var form = document.getElementById("registerForm");
+        if (!form) return null;
+        return {
+          name: form.name.value,
+          category: form.category.value,
+          color: form.color.value,
+          date: form.date.value,
+          location: form.location.value,
+          features: form.features.value
+        };
+      }
+
+      function restoreRegisterFormValues(snap) {
+        var form = document.getElementById("registerForm");
+        if (!form || !snap) return;
+        if (snap.name) form.name.value = snap.name;
+        if (snap.category) form.category.value = snap.category;
+        if (snap.color) form.color.value = snap.color;
+        if (snap.date) form.date.value = snap.date;
+        if (snap.location) form.location.value = snap.location;
+        if (snap.features) form.features.value = snap.features;
+      }
+
+      function bindRegisterEvents() {
+        document.getElementById("segLostBtn").addEventListener("click", function () {
+          var snap = captureRegisterFormValues();
+          state.registerType = "lost";
+          state.registerError = "";
+          render();
+          restoreRegisterFormValues(snap);
+        });
+        document.getElementById("segFoundBtn").addEventListener("click", function () {
+          var snap = captureRegisterFormValues();
+          state.registerType = "found";
+          state.registerError = "";
+          render();
+          restoreRegisterFormValues(snap);
+        });
+        document.getElementById("regCancelBtn").addEventListener("click", function () {
+          setView("list");
+        });
+
+        var up1 = document.getElementById("regPhotoUpload");
+        var up2 = document.getElementById("regPhotoCamera");
+        if (up1) {
+          up1.addEventListener("change", function () {
+            if (this.files && this.files[0]) handleRegisterPhotoSelect(this.files[0]);
+          });
+        }
+        if (up2) {
+          up2.addEventListener("change", function () {
+            if (this.files && this.files[0]) handleRegisterPhotoSelect(this.files[0]);
+          });
+        }
+
+        var previewMatchBtn = document.getElementById("previewPhotoMatchBtn");
+        if (previewMatchBtn) {
+          previewMatchBtn.addEventListener("click", function () {
+            if (!state.photoDraft) return;
+            var snap = captureRegisterFormValues() || {};
+            var pa = state.photoDraft.analysis;
+            var previewItem = {
+              id: "preview-" + Date.now(),
+              type: "lost",
+              source: "user",
+              name: (snap.name && snap.name.trim()) || (pa.dominantColor + " 물건 (사진 미리보기)"),
+              category: snap.category || "기타",
+              color: (snap.color && snap.color.trim()) || pa.dominantColor,
+              location: (snap.location && snap.location.trim()) || "위치 미입력",
+              date: snap.date || getRelativeDate(0),
+              features: (snap.features && snap.features.trim()) || pa.summary,
+              status: "찾는 중",
+              photoDataUrl: state.photoDraft.dataUrl,
+              photoAnalysis: pa
+            };
+            var foundItems = state.items.filter(function (it) {
+              return it.type === "found";
+            });
+            loadingModal.classList.add("open");
+            setTimeout(function () {
+              var evaluated = foundItems
+                .map(function (f) {
+                  return compareLostWithFound(previewItem, f);
+                })
+                .sort(function (a, b) {
+                  return b.rankScore - a.rankScore;
+                });
+              loadingModal.classList.remove("open");
+              openAnalysisRecord({
+                id: "an-preview-" + Date.now(),
+                createdAt: Date.now(),
+                lostItemId: previewItem.id,
+                lostSnapshot: previewItem,
+                comparedCount: foundItems.length,
+                candidates: evaluated.slice(0, 4)
+              });
+            }, 450);
+          });
+        }
+
+        var applyBtn = document.getElementById("applyPhotoAnalysisBtn");
+        if (applyBtn) {
+          applyBtn.addEventListener("click", function () {
+            applyPhotoToRegisterForm(true);
+            showToast("사진 색상과 외형 설명을 다시 반영했습니다.");
+          });
+        }
+
+        var removeBtn = document.getElementById("removeDraftPhotoBtn");
+        if (removeBtn) {
+          removeBtn.addEventListener("click", function () {
+            var snap = captureRegisterFormValues();
+            state.photoDraft = null;
+            render();
+            restoreRegisterFormValues(snap);
+          });
+        }
+
+        var submitMode = "save";
+        var submitButtons = document.querySelectorAll('#registerForm button[type="submit"]');
+        for (var i = 0; i < submitButtons.length; i++) {
+          submitButtons[i].addEventListener("click", function () {
+            submitMode = this.getAttribute("data-submit-mode") || "save";
+          });
+        }
+
+        document.getElementById("registerForm").addEventListener("submit", function (e) {
+          e.preventDefault();
+          var name = this.name.value.trim();
+          var category = this.category.value;
+          var color = this.color.value.trim();
+          var date = this.date.value;
+          var location = this.location.value.trim();
+          var features = this.features.value.trim();
+
+          var snap = { name: name, category: category, color: color, date: date, location: location, features: features };
+
+          function fail(msg) {
+            state.registerError = msg;
+            render();
+            restoreRegisterFormValues(snap);
+          }
+
+          if (!name) return fail("물건 이름을 입력해주세요.");
+          if (!color) return fail("물건 색상을 입력해주세요.");
+          if (!location) return fail(state.registerType === "lost" ? "분실 장소를 입력해주세요." : "발견 및 보관 장소를 입력해주세요.");
+          if (!date) return fail("날짜를 선택해주세요.");
+          if (date > getRelativeDate(0)) return fail("오늘보다 미래의 날짜는 선택할 수 없습니다.");
+          if (features.length < 5) return fail("외형과 특징을 5글자 이상 구체적으로 입력해주세요.");
+
+          var piiErr = detectPersonalInfo(name + " " + location + " " + features);
+          if (piiErr) return fail(piiErr);
+
+          var newItem = {
+            id: "user-" + Date.now(),
+            type: state.registerType,
+            source: "user",
+            name: name,
+            category: category,
+            color: color,
+            location: location,
+            date: date,
+            features: features,
+            status: state.registerType === "lost" ? "찾는 중" : "보관 중",
+            photoDataUrl: state.photoDraft ? state.photoDraft.dataUrl : "",
+            photoAnalysis: state.photoDraft ? state.photoDraft.analysis : null,
+            createdAt: Date.now()
+          };
+
+          state.items.unshift(newItem);
+          saveItems(state.items);
+          state.photoDraft = null;
+          state.registerError = "";
+
+          state.filters.type = "all";
+          state.filters.source = "all";
+          state.filters.status = "all";
+
+          showToast((state.registerType === "lost" ? "분실물" : "발견물") + "이 안전하게 등록되었습니다.");
+          setView("list");
+
+          if (state.registerType === "lost" && submitMode === "analyze") {
+            runAnalysisForLostItem(newItem.id);
+          }
+        });
+      }
+
+      function bindDirectoryResultEvents() {
+        var resetFiltersBtn = document.getElementById("resetFiltersBtn");
+        if (resetFiltersBtn) {
+          resetFiltersBtn.addEventListener("click", function () {
+            state.filters = { search: "", type: "all", source: "all", category: "all", status: "all", photoOnly: false };
+            render();
+          });
+        }
+        var emptyRegisterBtn = document.getElementById("emptyRegisterBtn");
+        if (emptyRegisterBtn) {
+          emptyRegisterBtn.addEventListener("click", function () {
+            setView("register");
+          });
+        }
+
+        var resultsRoot = document.getElementById("directoryResults") || appMain;
+        resultsRoot.querySelectorAll("[data-action]").forEach(function (el) {
+          el.addEventListener("click", function () {
+            var action = this.getAttribute("data-action");
+            var id = this.getAttribute("data-id");
+
+            if (action === "set-status") {
+              updateItemStatus(id, this.getAttribute("data-status"));
+            } else if (action === "analyze-item") {
+              runAnalysisForLostItem(id);
+            } else if (action === "view-last-analysis") {
+              for (var a = 0; a < state.analyses.length; a++) {
+                if (state.analyses[a].lostItemId === id) {
+                  openAnalysisRecord(state.analyses[a]);
+                  break;
+                }
+              }
+            } else if (action === "open-lightbox") {
+              for (var b = 0; b < state.items.length; b++) {
+                if (state.items[b].id === id) {
+                  openLightbox(state.items[b]);
+                  break;
+                }
+              }
+            } else if (action === "attach-card-photo") {
+              state.pendingCardPhotoItemId = id;
+              cardPhotoInput.value = "";
+              cardPhotoInput.click();
+            } else if (action === "remove-card-photo") {
+              for (var r = 0; r < state.items.length; r++) {
+                if (state.items[r].id === id) {
+                  state.items[r].photoDataUrl = "";
+                  state.items[r].photoAnalysis = null;
+                  break;
+                }
+              }
+              saveItems(state.items);
+              showToast("등록된 사진을 삭제했습니다.");
+              render();
+            } else if (action === "ask-delete") {
+              state.pendingDeleteId = id;
+              render();
+            } else if (action === "cancel-delete") {
+              state.pendingDeleteId = null;
+              render();
+            } else if (action === "confirm-delete") {
+              state.items = state.items.filter(function (it) {
+                return it.id !== id;
+              });
+              state.pendingDeleteId = null;
+              saveItems(state.items);
+              showToast("등록한 물건을 삭제했습니다.");
+              render();
+            }
+          });
+        });
+      }
+
+      function bindDirectoryEvents() {
+        var searchInput = document.getElementById("searchInput");
+        if (searchInput) {
+          searchInput.addEventListener("input", function () {
+            state.filters.search = this.value;
+            var resultsEl = document.getElementById("directoryResults");
+            if (resultsEl) {
+              resultsEl.innerHTML = renderDirectoryResultsMarkup();
+              bindDirectoryResultEvents();
+            }
+          });
+        }
+
+        var typeBtns = document.querySelectorAll("[data-filter-type]");
+        for (var i = 0; i < typeBtns.length; i++) {
+          typeBtns[i].addEventListener("click", function () {
+            state.filters.type = this.getAttribute("data-filter-type");
+            render();
+          });
+        }
+
+        var sourceBtns = document.querySelectorAll("[data-filter-source]");
+        for (var j = 0; j < sourceBtns.length; j++) {
+          sourceBtns[j].addEventListener("click", function () {
+            state.filters.source = this.getAttribute("data-filter-source");
+            render();
+          });
+        }
+
+        document.getElementById("categoryFilter").addEventListener("change", function () {
+          state.filters.category = this.value;
+          render();
+        });
+        document.getElementById("statusFilter").addEventListener("change", function () {
+          state.filters.status = this.value;
+          render();
+        });
+        document.getElementById("photoOnlyFilter").addEventListener("change", function () {
+          state.filters.photoOnly = this.checked;
+          render();
+        });
+
+        document.getElementById("dirNewRegisterBtn").addEventListener("click", function () {
+          setView("register");
+        });
+
+        var askResetBtn = document.getElementById("askResetExampleBtn");
+        if (askResetBtn) {
+          askResetBtn.addEventListener("click", function () {
+            state.pendingResetExample = true;
+            render();
+          });
+        }
+        var cancelResetBtn = document.getElementById("cancelResetExampleBtn");
+        if (cancelResetBtn) {
+          cancelResetBtn.addEventListener("click", function () {
+            state.pendingResetExample = false;
+            render();
+          });
+        }
+        var confirmResetBtn = document.getElementById("confirmResetExampleBtn");
+        if (confirmResetBtn) {
+          confirmResetBtn.addEventListener("click", function () {
+            var userOnly = state.items.filter(function (it) {
+              return it.source === "user";
+            });
+            state.items = userOnly.concat(createSeedItems());
+            saveItems(state.items);
+            state.pendingResetExample = false;
+            showToast("예시 데이터를 기본 상태로 복원했습니다.");
+            render();
+          });
+        }
+
+        bindDirectoryResultEvents();
+      }
+
+      function bindHistoryEvents() {
+        var goList = document.getElementById("historyGoListBtn");
+        if (goList) {
+          goList.addEventListener("click", function () {
+            setView("list");
+          });
+        }
+        appMain.querySelectorAll("[data-action]").forEach(function (el) {
+          el.addEventListener("click", function () {
+            var action = this.getAttribute("data-action");
+            var hid = this.getAttribute("data-history-id");
+            if (action === "open-history-record") {
+              for (var i = 0; i < state.analyses.length; i++) {
+                if (state.analyses[i].id === hid) {
+                  openAnalysisRecord(state.analyses[i]);
+                  break;
+                }
+              }
+            } else if (action === "delete-history-record") {
+              state.analyses = state.analyses.filter(function (rec) {
+                return rec.id !== hid;
+              });
+              saveAnalyses(state.analyses);
+              showToast("분석 기록을 삭제했습니다.");
+              render();
+            }
+          });
+        });
+      }
+
+      function buildCleanStandaloneHtml() {
+        var clone = document.documentElement.cloneNode(true);
+        var mainEl = clone.querySelector("#appMain");
+        if (mainEl) mainEl.innerHTML = "";
+        var navEls = clone.querySelectorAll("[data-nav]");
+        for (var i = 0; i < navEls.length; i++) {
+          navEls[i].classList.remove("active");
+        }
+        var c1 = clone.querySelector("#navItemCount");
+        if (c1) c1.textContent = "0";
+        var c2 = clone.querySelector("#navHistoryCount");
+        if (c2) c2.textContent = "0";
+        var modals = clone.querySelectorAll(".modal-backdrop");
+        for (var m = 0; m < modals.length; m++) {
+          modals[m].classList.remove("open");
+        }
+        var mBody = clone.querySelector("#analysisModalBody");
+        if (mBody) mBody.innerHTML = "";
+        var mFoot = clone.querySelector("#analysisModalFoot");
+        if (mFoot) mFoot.innerHTML = "";
+        var lbImg = clone.querySelector("#lightboxImg");
+        if (lbImg) lbImg.removeAttribute("src");
+        var toast = clone.querySelector("#toast");
+        if (toast) {
+          toast.classList.remove("show");
+          toast.textContent = "";
+        }
+        return "<!doctype html>\n" + clone.outerHTML + "\n";
+      }
+
+      function downloadStandaloneIndexHtml() {
+        try {
+          var htmlText = buildCleanStandaloneHtml();
+          var blob = new Blob([htmlText], { type: "text/html;charset=utf-8" });
+          var url = URL.createObjectURL(blob);
+          var link = document.createElement("a");
+          link.href = url;
+          link.download = "index.html";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(function () {
+            URL.revokeObjectURL(url);
+          }, 1000);
+          showToast("index.html 파일 다운로드를 시작했습니다.");
+        } catch (err) {
+          showToast("파일 다운로드가 제한된 환경이라면 '전체 HTML 복사'를 이용해주세요.");
+        }
+      }
+
+      function copyStandaloneIndexHtml() {
+        var htmlText = buildCleanStandaloneHtml();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(htmlText)
+            .then(function () {
+              showToast("전체 index.html 코드를 클립보드에 복사했습니다.");
+            })
+            .catch(function () {
+              showToast("클립보드 복사에 실패했습니다. 'index.html 다운로드'를 눌러주세요.");
+            });
+        } else {
+          showToast("이 환경에서는 클립보드 자동 복사가 지원되지 않습니다.");
+        }
+      }
+
+      // Global Header / Nav / Modal Listeners
+      document.getElementById("brandBtn").addEventListener("click", function () {
+        setView("home");
+      });
+      var headerDownloadBtn = document.getElementById("headerDownloadHtmlBtn");
+      if (headerDownloadBtn) {
+        headerDownloadBtn.addEventListener("click", downloadStandaloneIndexHtml);
+      }
+      document.getElementById("headerRegisterCta").addEventListener("click", function () {
+        setView("register");
+      });
+
+      var allNavBtns = document.querySelectorAll("[data-nav]");
+      for (var n = 0; n < allNavBtns.length; n++) {
+        allNavBtns[n].addEventListener("click", function () {
+          setView(this.getAttribute("data-nav"));
+        });
+      }
+
+      cardPhotoInput.addEventListener("change", function () {
+        var file = this.files && this.files[0];
+        var targetId = state.pendingCardPhotoItemId;
+        if (!file || !targetId) return;
+        processImageFile(file)
+          .then(function (res) {
+            for (var i = 0; i < state.items.length; i++) {
+              if (state.items[i].id === targetId) {
+                state.items[i].photoDataUrl = res.dataUrl;
+                state.items[i].photoAnalysis = res.analysis;
+                break;
+              }
+            }
+            saveItems(state.items);
+            state.pendingCardPhotoItemId = null;
+            showToast("사진과 색상 분석(" + res.analysis.dominantColor + ")을 저장했습니다.");
+            render();
+          })
+          .catch(function (err) {
+            state.pendingCardPhotoItemId = null;
+            showToast(err.message || "사진 추가에 실패했습니다.");
+          });
+      });
+
+      document.getElementById("closeAnalysisModalBtn").addEventListener("click", closeAnalysisModal);
+      analysisModal.addEventListener("click", function (e) {
+        if (e.target === analysisModal) closeAnalysisModal();
+      });
+
+      document.getElementById("closeLightboxBtn").addEventListener("click", function () {
+        lightboxModal.classList.remove("open");
+      });
+      lightboxModal.addEventListener("click", function (e) {
+        if (e.target === lightboxModal) lightboxModal.classList.remove("open");
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          closeAnalysisModal();
+          lightboxModal.classList.remove("open");
+        }
+      });
+
+      // Expose pure helpers on window only for quick automated unit checks when needed (no sensitive data)
+      window.__chajajwoLogic = {
+        detectPersonalInfo: detectPersonalInfo,
+        escapeHtml: escapeHtml,
+        classifyRgbToKoreanColor: classifyRgbToKoreanColor,
+        compareLostWithFound: compareLostWithFound
+      };
+
+      render();
+    })();
+  </script>
+
+
+</body><whale-quicksearch translate="no" style="visibility: visible;"></whale-quicksearch></html>
